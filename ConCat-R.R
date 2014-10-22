@@ -27,7 +27,7 @@ bwt <- function(s) {
     #Apply Burrows-Wheeler transform to input string
     
     stopifnot(grepl('\0', s) == TRUE)
-    s += "\0"
+    s = paste(s, "\0")
     table = c()
     for (i in c(1:length(s))){
         table = c(table, paste(substr(x, i, length(s)), substr(x, 1, length(s))))
