@@ -66,7 +66,9 @@ for (filename in files){
     for (species in speciesAll){
         row_to_find = data.frame("Species"=species)
         if (isTRUE(nrow(merge(row_to_find,newDataObject[filename]))>0) == FALSE){
-            newDataObject[[filename]] = insertRow(newDataObject[[filename]], data.frame("FileName" = filename, "Species" = species, "Sequence" = paste(rep(strsplit("?","")[[1]], each=length(newDataObject[[filename]]$Sequence[1])), collapse="")), 1)
+            newDataObject[[filename]] = insertRow(newDataObject[[filename]], \
+                data.frame("FileName" = filename, "Species" = species, "Sequence" = paste(rep(strsplit("?","")[[1]],\
+                    each=length(newDataObject[[filename]]$Sequence[1])), collapse="")), 1)
         }
     }
 }
@@ -82,7 +84,8 @@ for (sname in speciesAll){
             }
         }
     }
-    concatFrame = insertRow(concatFrame, data.frame("Filename" = "MasterConcat", "Species" = sname, "Sequence" = do.call(paste, c(as.list(sdata), sep=""))), 1)
+    concatFrame = insertRow(concatFrame, data.frame("Filename" = "MasterConcat", "Species" = sname,\
+        "Sequence" = do.call(paste, c(as.list(sdata), sep=""))), 1)
 }
 
 
