@@ -66,7 +66,8 @@ ConCat <- function(dataFileExtension){
         data = read.alignment(file, "fasta")
         x = 1
         while (x <= length(data$seq)){
-            dataObject = insertRow(dataObject, data.frame("FileName" = file, "Species" = data$nam[x], "Sequence" = data$seq[x]), 1)
+            dataObject = insertRow(dataObject, data.frame("FileName" = file, +
+                "Species" = data$nam[x], "Sequence" = data$seq[x]), 1)
             x = x + 1
         }
     }
