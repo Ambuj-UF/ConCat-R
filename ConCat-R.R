@@ -45,8 +45,7 @@ bwt <- function(s) {
 }
 
 ibwt <- function(r, *args) {
-    """Inverse Burrows-Wheeler transform. args is the original index \
-    if it was not indicated by a null byte"""
+    """Inverse Burrows-Wheeler transform. args is the original index if it was not indicated by a null byte"""
     """Working on it"""
     
 }
