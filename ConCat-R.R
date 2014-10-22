@@ -18,13 +18,13 @@
 #                                                                                                              #
 ################################################################################################################
 
-"""Under development phase"""
+#Under development phase
 
 
 library(seqinr)
 
 bwt <- function(s) {
-    """Apply Burrows-Wheeler transform to input string."""
+    #Apply Burrows-Wheeler transform to input string
     
     stopifnot(grepl('\0', s) == TRUE)
     s += "\0"
@@ -43,8 +43,8 @@ bwt <- function(s) {
 }
 
 ibwt <- function(r, *args) {
-    """Inverse Burrows-Wheeler transform. args is the original index if it was not indicated by a null byte"""
-    """Working on it"""
+    #Inverse Burrows-Wheeler transform. args is the original index if it was not indicated by a null byte
+    #Working on it
     
 }
 
@@ -93,9 +93,10 @@ ConCat <- function(dataFileExtension){
         for (species in speciesAll){
             row_to_find = data.frame("Species"=species)
             if (isTRUE(nrow(merge(row_to_find,newDataObject[filename]))>0) == FALSE){
-                newDataObject[[filename]] = insertRow(newDataObject[[filename]], \
-                    data.frame("FileName" = filename, "Species" = species, "Sequence" = paste(rep(strsplit("?","")[[1]],\
-                        each=length(newDataObject[[filename]]$Sequence[1])), collapse="")), 1)
+                newDataObject[[filename]] = insertRow(newDataObject[[filename]], +
+                    data.frame("FileName" = filename, "Species" = species, +
+                        "Sequence" = paste(rep(strsplit("?","")[[1]], +
+                            each=length(newDataObject[[filename]]$Sequence[1])), collapse="")), 1)
             }
         }
     }
@@ -111,8 +112,8 @@ ConCat <- function(dataFileExtension){
                 }
             }
         }
-        concatFrame = insertRow(concatFrame, data.frame("FileName" = "MasterConcat", "Species" = sname,\
-            "Sequence" = do.call(paste, c(as.list(sdata), sep=""))), 1)
+        concatFrame = insertRow(concatFrame, data.frame("FileName" = "MasterConcat", +
+            "Species" = sname, "Sequence" = do.call(paste, c(as.list(sdata), sep=""))), 1)
     }
 
     concatFrame = concatFrame[-nrow(concatFrame),]
@@ -122,7 +123,7 @@ ConCat <- function(dataFileExtension){
     retAlign$seq = concatFrame$Sequence
     retAlign$com = "NA"
     
-    write.fasta(as.list(retAlign),names(retAlign),"Output.txt")
+    write.fasta(as.list(retAlign),names(retAlign),"Output.fasta")
     return(retAlign)
 
 
