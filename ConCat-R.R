@@ -123,7 +123,6 @@ ConCat <- function(dataFileExtension){
     retAlign$seq = concatFrame$Sequence
     retAlign$com = "NA"
     
-    write.fasta(as.list(retAlign),names(retAlign),"Output.fasta")
     return(retAlign)
 
 
