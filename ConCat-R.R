@@ -66,7 +66,7 @@ ConCat <- function(dataFileExtension){
         data = read.alignment(file, "fasta")
         x = 1
         while (x <= length(data$seq)){
-            dataObject = insertRow(dataObject, data.frame("FileName" = file, +
+            dataObject = insertRow(dataObject, data.frame("FileName" = file,
                 "Species" = data$nam[x], "Sequence" = data$seq[x]), 1)
             x = x + 1
         }
@@ -93,10 +93,10 @@ ConCat <- function(dataFileExtension){
     for (filename in files){
         for (species in speciesAll){
             row_to_find = data.frame("Species"=species)
-            if (isTRUE(nrow(merge(row_to_find,newDataObject[filename]))>0) == FALSE){
-                newDataObject[[filename]] = insertRow(newDataObject[[filename]], +
-                    data.frame("FileName" = filename, "Species" = species, +
-                        "Sequence" = paste(rep(strsplit("?","")[[1]], +
+            if (isTRUE(nrow(merge(row_to_find,newDataObject[[filename]]))>0) == FALSE){
+                newDataObject[[filename]] = insertRow(newDataObject[[filename]],
+                    data.frame("FileName" = filename, "Species" = species,
+                        "Sequence" = paste(rep(strsplit("?","")[[1]],
                             each=length(newDataObject[[filename]]$Sequence[1])), collapse="")), 1)
             }
         }
@@ -113,7 +113,7 @@ ConCat <- function(dataFileExtension){
                 }
             }
         }
-        concatFrame = insertRow(concatFrame, data.frame("FileName" = "MasterConcat", +
+        concatFrame = insertRow(concatFrame, data.frame("FileName" = "MasterConcat",
             "Species" = sname, "Sequence" = do.call(paste, c(as.list(sdata), sep=""))), 1)
     }
 
