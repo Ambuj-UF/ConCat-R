@@ -44,6 +44,12 @@ bwt <- function(s) {
     return(do.call(paste, c(as.list(last_column), sep="")))
 }
 
+ibwt <- function(r, *args) {
+    """Inverse Burrows-Wheeler transform. args is the original index \
+    if it was not indicated by a null byte"""
+    """Working on it"""
+    
+}
 
 insertRow <- function(existingDF, newrow, r) {
     existingDF <- rbind(existingDF,setNames(newrow, names(existingDF)))
