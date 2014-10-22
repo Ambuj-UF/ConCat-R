@@ -125,6 +125,7 @@ ConCat <- function(dataFileExtension){
     retAlign$com = "NA"
     
     return(retAlign)
+}
 
 
 
