@@ -56,14 +56,16 @@ insertRow <- function(existingDF, newrow, r) {
 }
 
 
-ConCat <- function(dataFileExtension){
+ConCat <- function(dataFileExtension, fileFormat){
     files = list.files(pattern=dataFileExtension)
     dataObject = data.frame("FileName"='Test',"Species"='Test',"Sequence"='Test')
     header_col = c('FileName', 'Species', 'Sequence')
     names(dataObject) = header_col
     
+    
+    
     for (file in files) {
-        data = read.alignment(file, "fasta")
+        data = read.alignment(file, fileFormat)
         x = 1
         while (x <= length(data$seq)){
             dataObject = insertRow(dataObject, data.frame("FileName" = file,
@@ -92,13 +94,26 @@ ConCat <- function(dataFileExtension){
     
     
     for (filename in files){
+        rFlag = FALSE
+        tmp <- sapply(newDataObject[[filename]][1,][3], as.character)
+        if (substr(tmp, getLength(tmp), getLength(tmp)) == '\r') {
+            rFlag = TRUE
+        }
+        
         for (species in speciesAll){
             row_to_find = data.frame("Species"=species)
             if (isTRUE(nrow(merge(row_to_find,newDataObject[[filename]]))>0) == FALSE){
-                tmp <- sapply(newDataObject[[filename]][1,][3], as.character)
+                
+                if (rFlag == TRUE) {
+                    missingObject = paste(paste(rep("?", getLength(tmp)-1), collapse=""), "\r", sep="")
+                }
+                else {
+                    missingObject = paste(rep("?", getLength(tmp)), collapse="")
+                }
+                
                 newDataObject[[filename]] = insertRow(newDataObject[[filename]],
                 data.frame("FileName" = filename, "Species" = species,
-                "Sequence" = paste(rep("?", getLength(tmp)), collapse="")), 1)
+                "Sequence" = missingObject), 1)
             }
         }
     }
@@ -125,7 +140,7 @@ ConCat <- function(dataFileExtension){
     return(concatFrame)
 }
 
-z = ConCat('*.fas')
+z = ConCat('*.fas', 'fasta')
 
 
 
@@ -136,3 +151,6 @@ for (i in 1:length(z$Sequence)){
 }
 
 sink()
+
+write.fasta(as.list(z$Sequence), z$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
+
