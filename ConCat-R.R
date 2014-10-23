@@ -24,8 +24,8 @@
 library(seqinr)
 
 #bwt <- function(s) {
-#Apply Burrows-Wheeler transform to input string
-
+    #Apply Burrows-Wheeler transform to input string
+    
 #    stopifnot(grepl('\0', s) == TRUE)
 #    s = paste(s, "\0")
 #    table = c()
@@ -38,14 +38,14 @@ library(seqinr)
 #    for (row in table){
 #        last_column = c(last_column, paste(substr(row, length(row), length(row)), substr(row, 1, length(row))))
 #    }
-
+    
 #    return(do.call(paste, c(as.list(last_column), sep="")))
 #}
 
 #ibwt <- function(r, *args) {
-#Inverse Burrows-Wheeler transform. args is the original index if it was not indicated by a null byte
-#Working on it
-
+    #Inverse Burrows-Wheeler transform. args is the original index if it was not indicated by a null byte
+    #Working on it
+    
 #}
 
 insertRow <- function(existingDF, newrow, r) {
@@ -61,19 +61,19 @@ ConCat <- function(dataFileExtension){
     dataObject = data.frame("FileName"='Test',"Species"='Test',"Sequence"='Test')
     header_col = c('FileName', 'Species', 'Sequence')
     names(dataObject) = header_col
-    
+
     for (file in files) {
         data = read.alignment(file, "fasta")
         x = 1
         while (x <= length(data$seq)){
             dataObject = insertRow(dataObject, data.frame("FileName" = file,
-            "Species" = data$nam[x], "Sequence" = data$seq[x]), 1)
+                "Species" = data$nam[x], "Sequence" = data$seq[x]), 1)
             x = x + 1
         }
     }
-    
+
     newDataObject = new.env()
-    
+
     for (filename in files){
         newDataObject[[filename]] = data.frame("FileName"='Test',"Species"='Test',"Sequence"='Test')
     }
@@ -87,23 +87,23 @@ ConCat <- function(dataFileExtension){
     }
     
     row_to_find <- data.frame(b="cat")
-    
+
     speciesAll = unique(dataObject$Species)
     
-    
+
     for (filename in files){
         for (species in speciesAll){
             row_to_find = data.frame("Species"=species)
             if (isTRUE(nrow(merge(row_to_find,newDataObject[[filename]]))>0) == FALSE){
                 tmp <- sapply(newDataObject[[filename]][1,][3], as.character)
                 newDataObject[[filename]] = insertRow(newDataObject[[filename]],
-                data.frame("FileName" = filename, "Species" = species,
-                "Sequence" = paste(rep(strsplit("?","")[[1]],
-                each=getLength(tmp)), collapse="")), 1)
+                    data.frame("FileName" = filename, "Species" = species,
+                        "Sequence" = paste(rep(strsplit("?","")[[1]],
+                            each=getLength(tmp)), collapse="")), 1)
             }
         }
     }
-    
+
     concatFrame = data.frame("FileName"='Test',"Species"='Test',"Sequence"='Test')
     
     for (sname in speciesAll){
@@ -115,19 +115,30 @@ ConCat <- function(dataFileExtension){
                 }
             }
         }
-        
+
         concatFrame = insertRow(concatFrame, data.frame("FileName" = "MasterConcat",
-        "Species" = sname, "Sequence" = do.call(paste, c(as.list(seqObject), sep=""))), 1)
+            "Species" = sname, "Sequence" = do.call(paste, c(as.list(seqObject), sep=""))), 1)
     }
-    
+
     concatFrame = concatFrame[-nrow(concatFrame),]
     concatFrame = concatFrame[-1,]
-    
+
     return(concatFrame)
 }
 
-z = ConCat('*.fas')
 
+
+z = ConCat('*.fas')
+print(z[1,][2])
+sink("outfile.txt")
+
+
+for (i in 1:length(z$Sequence)){
+  cat(paste(paste(">",sapply(z[i,][2], as.character)),sapply(z[i,][3], as.character),sep='\n'))
+   cat("\n\n")
+}
+
+sink()
 
 
 
