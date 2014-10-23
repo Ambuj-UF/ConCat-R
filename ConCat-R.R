@@ -141,5 +141,10 @@ for (i in 1:length(z$Sequence)){
 sink()
 
 
+sink("Output.txt")
+for (i in 1:length(z$Sequence)){
+    cat(paste(paste(">",sapply(z[i,][2], as.character)),sapply(z[i,][3], as.character),sep='\n'))
+    cat("\n\n")
+}
 
-
+sink()
