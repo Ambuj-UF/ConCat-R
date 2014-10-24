@@ -348,13 +348,11 @@ insertRow <- function(existingDF, newrow, r) {
 }
 
 
-ConCat <- function(dataFileExtension, fileFormat){
+baseConCat <- function(dataFileExtension, fileFormat){
     files = list.files(pattern=dataFileExtension)
     dataObject = data.frame("FileName"='Test',"Species"='Test',"Sequence"='Test')
     header_col = c('FileName', 'Species', 'Sequence')
     names(dataObject) = header_col
-    
-    
     
     for (file in files) {
         data = read.alignment(file, fileFormat)
@@ -515,7 +513,7 @@ concat <- function (extension, inpform) {
         write.nexus.data(outData, file="FuncOutput.nex", format = "dna", datablock = TRUE, interleaved = TRUE)
     }
     else {
-        outData = ConCat(extension, inpform)
+        outData = baseConCat(extension, inpform)
         write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
         return(outData)
     }
