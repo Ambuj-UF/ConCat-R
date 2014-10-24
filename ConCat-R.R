@@ -507,17 +507,20 @@ nexConCat <- function(dataFileExtension, fileFormat) {
     return(concatFrame)
 }
 
-concat <- function (extension, inpform) {
+concat <- function (extension, inpform, writeData) {
     if (inpform == 'nexus') {
         outData = nexConCat(extension, 'nexus')
-        write.nexus(outData, file="FuncOutput.nex", format = "dna", datablock = TRUE, interleaved = TRUE)
+        if (writeData == TRUE) {
+            write.nexus(outData, file="FuncOutput.nex", format = "dna", datablock = TRUE, interleaved = TRUE)
+        }
     }
     else {
         outData = baseConCat(extension, inpform)
-        write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
-        return(outData)
+        if (writeData == TRUE) {
+            write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
+        }
     }
-    
+    return(outData)
 }
 
 
