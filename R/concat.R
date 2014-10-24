@@ -484,7 +484,11 @@ concat <- function (ext, form, writeData) {
     if (form == 'nexus') {
         outData = nexConCat(ext, 'nexus')
         if (writeData == TRUE) {
-            write.nexus(outData, file="FuncOutput.nex", format = "dna", datablock = TRUE, interleaved = TRUE)
+            writeDataObj = list()
+            for (i in 1:length(outData)) {
+                writeDataObj[[outData[i,][2]]] = strsplit(sapply(outData[i,][3], as.character), '')
+            }
+            write.nexus(writeDataObj, file="FuncOutput.nex", format = "dna", datablock = TRUE, interleaved = TRUE)
         }
     }
     else {
