@@ -342,8 +342,16 @@ nexConCat <- function(dataFileExtension, fileFormat) {
     return(concatFrame)
 }
 
+concat <- function (extension, inpform) {
+    if (inpform == 'nexus') {
+        outData = nexConCat(extension, 'nexus')
+    }
+    else {
+        outData = ConCat(extension, inpform)
+    }
+    write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
+    return(outData)
+}
 
-z = nexConCat('*.nex', 'nexus')
 
-write.fasta(as.list(z$Sequence), z$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
 
