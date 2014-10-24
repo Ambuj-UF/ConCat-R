@@ -510,7 +510,7 @@ nexConCat <- function(dataFileExtension, fileFormat) {
 concat <- function (extension, inpform) {
     if (inpform == 'nexus') {
         outData = nexConCat(extension, 'nexus')
-        write.nexus.data(outData, file="FuncOutput.nex", format = "dna", datablock = TRUE, interleaved = TRUE)
+        write.nexus(outData, file="FuncOutput.nex", format = "dna", datablock = TRUE, interleaved = TRUE)
     }
     else {
         outData = baseConCat(extension, inpform)
