@@ -4,7 +4,8 @@
 #                                                                                                              #
 # "read.nex" and "write.nexus" is a Simplified NEXUS data parser by Johan Nylander, nylander @ scs.fsu.edu     #
 # WARNING: This is parser reads a restricted nexus format, see the link below for details                      #
-# http://svitsrv25.epfl.ch/R-doc/library/ape/html/read.nexus.data.html                                         #
+# http://svitsrv25.epfl.ch/R-doc/library/ape/html/read.nexus.data.html &                                       #
+# http://www.inside-r.org/packages/cran/ape/docs/write.nexus.data                                              #
 #                                                                                                              #
 # This program is free software: you can redistribute it and/or modify                                         #
 # it under the terms of the GNU General Public License as published by                                         #
