@@ -511,12 +511,14 @@ nexConCat <- function(dataFileExtension, fileFormat) {
 concat <- function (extension, inpform) {
     if (inpform == 'nexus') {
         outData = nexConCat(extension, 'nexus')
+        write.nexus.data(outData, file="FuncOutput.nex", format = "dna", datablock = TRUE, interleaved = TRUE)
     }
     else {
         outData = ConCat(extension, inpform)
+        write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
+        return(outData)
     }
-    write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
-    return(outData)
+    
 }
 
 
