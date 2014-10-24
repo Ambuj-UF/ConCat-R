@@ -344,16 +344,6 @@ nexConCat <- function(dataFileExtension, fileFormat) {
 
 
 z = nexConCat('*.nex', 'nexus')
-x=sapply(z[2,][3], as.character)
-print(getLength(x))
-
-sink("Output.fas")
-for (i in 1:length(z$Sequence)){
-    cat(paste(paste(">",sapply(z[i,][2], as.character)),sapply(z[i,][3], as.character),sep='\n'))
-    cat("\n\n")
-}
-
-sink()
 
 write.fasta(as.list(z$Sequence), z$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
 
