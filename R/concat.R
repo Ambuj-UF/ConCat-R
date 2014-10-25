@@ -337,6 +337,8 @@ baseConCat <- function(dataFileExtension, fileFormat){
         }
     }
     
+    
+    
     newDataObject = new.env()
     
     for (filename in files){
