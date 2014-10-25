@@ -54,6 +54,9 @@ excTaxaOd <- functions (alignmentObject, authorityFile) {
             newTaxaInc = c(newTaxaInc, paste(taxInc[i,], '\r', sep=''))
         }
     }
+    
+    else {newTaxaExc = taxExc}
+    
     dataObject = alignmentObject[!(alignmentObject$Species) %in% taxExc,]
     return(alignmentObject)
 }
@@ -69,6 +72,9 @@ incTaxaOd <- functions (alignmentObject, authorityFile) {
             newTaxaExc = c(newTaxaExc, paste(taxExc[i,], '\r', sep=''))
         }
     }
+    
+    else {newTaxaInc = taxInc}
+    
     dataObject = alignmentObject[(alignmentObject$Species) %in% newTaxaExc,]
     return(alignmentObject)
 }
