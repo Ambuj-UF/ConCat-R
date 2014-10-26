@@ -22,12 +22,90 @@
 # Calculates fast evolving sites
 
 
-shannonNuc <- function (Obj) {
+shannon <- function (Obj) {
+    totEntVect = c()
+    entList = list()
+    for (i in 1:length(d[[1]])) {
+        entList[[i]] = list()
+        objects = c()
+        for (j in 1:length(names(Obj))) {
+            objects = c(objects, Obj[[j]][i])
+        }
+        
+        objects = objects[!objects %in% c('?')]
+        uniqObj = unique(objects)
+        
+        freqVector = c()
+        for (uniqData in uniqObj) {
+            counter = 0
+            for (inData in objects) {
+                if (inData == uniqData) {
+                    counter = counter + 1
+                }
+            }
+            freqVector = c(freqVector, counter/length(objects))
+        }
+        
+        colEntropyVector = c()
+        for (values in freqVector) {
+            colEntropyVector = c(colEntropyVector, values*log(values))
+        }
+        
+        colEntropy = -sum(colEntropyVector)
+        totEntVect = c(totEntVect, colEntropy)
+    }
     
+    entropy = sum(totEntVect)/length(d[[1]])
+    return(entropy)
 }
 
+
+
 shannonProt <- function (Obj) {
+    totEntVect = c()
+    entList = list()
+    for (i in 1:length(d[[1]])) {
+        entList[[i]] = list()
+        objects = c()
+        for (j in 1:length(names(Obj))) {
+            objects = c(objects, Obj[[j]][i])
+        }
+        
+        objects = objects[!objects %in% c('?')]
+        
+        aminoList = list()
+        aminoList$a = c('d', 'e')
+        aminoList$b = c('r', 'k')
+        aminoList$i = c('i', 'v')
+        aminoList$l = c('l', 'm')
+        aminoList$f = c('f', 'w')
+        aminoList$n = c('n', 'q')
+        aminoList$s = c('s', 't')
+        
+        uniqObj = unique(objects)
+        
+        freqVector = c()
+        for (uniqData in uniqObj) {
+            counter = 0
+            for (inData in objects) {
+                if (inData == uniqData) {
+                    counter = counter + 1
+                }
+            }
+            freqVector = c(freqVector, counter/length(objects))
+        }
+        
+        colEntropyVector = c()
+        for (values in freqVector) {
+            colEntropyVector = c(colEntropyVector, values*log(values))
+        }
+        
+        colEntropy = -sum(colEntropyVector)
+        totEntVect = c(totEntVect, colEntropy)
+    }
     
+    entropy = sum(totEntVect)/length(d[[1]])
+    return(entropy)
 }
 
 
