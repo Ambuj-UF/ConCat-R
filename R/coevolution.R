@@ -22,3 +22,51 @@
 # Calculates coevlving amino acid sites
 
 
+Poisson_dist <- function (seq1, seq2) {
+    dist = 0
+    gap = 0
+    for (i in 1:length(seq1)){
+        if (seq1[[i]] == seq2[[i]] && seq1[[i]] != '-' && seq2[[i]] != '-') {
+            dist = dist + 1
+        }
+        if (seq1[[i]] == '-' || seq2[[i]] == '-') {
+            gap = gap + 1
+        }
+    }
+    return(Poisson(dist, length(seq1) - gap))
+}
+
+Poisson <- function (distance, long) {
+    pdist = 0
+    if ((1 - (distance/long)) != 0) {
+        pdist = -log(1 - (distance/long))
+    }
+    else { pdist = 0}
+    
+    return(pdist)
+}
+
+
+optimize <- function (seqObj) {
+    distance = c()
+    seqNameVec = c()
+    for (i in 1:length(names(seqObj))) {
+        seqNameVec = c(seqNameVec, names(seqObj[i]))
+        inSeqObj = seqObj[!names(seqObj[i]) %in% seqNameVec]
+        seq1 = seqObj[i][names(seqObj[i])]
+        for (j in 1:length(names(seqNameVec))) {
+            seq2 = seqObj[j][names(seqObj[j])]
+            distance = c(distance, Poisson_dist(seq1, seq2))
+        }
+    }
+    
+    sorted_dist = sort(distance)
+}
+
+
+
+
+
+
+
+
