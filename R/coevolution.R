@@ -47,6 +47,22 @@ Poisson <- function (distance, long) {
 }
 
 
+
+Relative_distance <- function (distance, sorted_dist) {
+    relative_distance = c()
+    if (sorted_dist[0] != 0) {
+        Flag = TRUE
+    }
+    for (i in 1:length(distance)) {
+        if (Flag == TRUE) {
+            relative_distance = c(relative_distance, distance[i]/sorted_dist[0])
+        }
+        if (Flag != True) {relative_distance = distance}
+    }
+    
+    return(relative_distance)
+}
+
 optimize <- function (seqObj) {
     distance = c()
     seqNameVec = c()
@@ -61,6 +77,7 @@ optimize <- function (seqObj) {
     }
     
     sorted_dist = sort(distance)
+    optimize_dist = relative_distance(distance, sorted_dist)
 }
 
 
