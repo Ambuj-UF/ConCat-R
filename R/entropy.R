@@ -81,6 +81,19 @@ shannonProt <- function (Obj) {
         aminoList$f = c('f', 'w')
         aminoList$n = c('n', 'q')
         aminoList$s = c('s', 't')
+        aminoList$c = c('c')
+        aminoList$h = c('h')
+        aminoList$u = c('u')
+        aminoList$g = c('g')
+        aminoList$p = c('p')
+        
+        for (i in length(objects)) {
+             for (j in 1:length(aminoList)) {
+                 if (objects[[i]] %in% aminoList[j][[names(aminoList[j])]]) {
+                     objects[[i]] = names(aminoList[j])
+                 }
+            }
+        }
         
         uniqObj = unique(objects)
         
