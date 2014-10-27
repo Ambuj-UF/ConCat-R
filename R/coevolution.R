@@ -153,7 +153,15 @@ thetaEK <- function (aliObj) {
 
 
 
-thetaC <- 
+thetaC <- function (thetaEKVals) {
+    allTheta = c()
+    for (i in length(names(thetaEKVals))) {
+        for (theta in thetaEKVals[names(thetaEKVals)[i]]) {
+            allTheta = c(allTheta, theta)
+        }
+    }
+    return(mean(allTheta))
+}
 
 
 
