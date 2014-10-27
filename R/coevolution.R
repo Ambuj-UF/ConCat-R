@@ -194,7 +194,8 @@ correlation(variability, mvar) {
         storeName = c(storeName, names(variability[i]))
         inVariability = variability[!names(variability) %in% storeName]
         for (j in length(names(inVariability))) {
-            corData[[paste(names(variability)[i], names(inVariability)[j]), sep='-']] = cor(variability[names(variability)[i]], inVariability[names(inVariability)[j]])
+            corData[[paste(names(variability)[i], names(inVariability)[j]), sep='-']] =
+                cor(variability[names(variability)[i]], inVariability[names(inVariability)[j]])
         }
     }
     
