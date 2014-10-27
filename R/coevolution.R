@@ -132,7 +132,7 @@ optimize <- function (seqObj) {
 #}
 
 
-thetaEK <- function (aliObj) {
+thetaEK <- function (aliObj, optimize_dist) {
     bmat = Blossum()
     posList = list()
     for (i in 1:length(aliObj[names(aliObj[1])])) {
@@ -142,7 +142,8 @@ thetaEK <- function (aliObj) {
             storeName = c(storeName, names(aliObj[m]))
             inAliObj = aliObj[!names(aliObj) %in% storeName]
             for (n in 1:length(names(inAliObj))) {
-                data = c(data, bmat[sapply(aliObj[[names(aliObj)[m]]], as.character), sapply(inAliObj[[names(inAliObj)[n]]], as.character)])
+                data = c(data, bmat[sapply(aliObj[[names(aliObj)[m]]], as.character), sapply(inAliObj[[names(inAliObj)[n]]],
+                    as.character)]/optimize_dist[[paste(names(aliObj[m], names(inAliObj[n]), sep='-'))]])
             }
         }
         posList[[paste(pos, i, sep = '')]] = data
@@ -150,7 +151,6 @@ thetaEK <- function (aliObj) {
     
     return(posList)
 }
-
 
 
 thetaC <- function (thetaEKVals) {
