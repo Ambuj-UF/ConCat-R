@@ -21,6 +21,42 @@
 
 # Calculates coevlving amino acid sites
 
+library(Biostrings)
+
+Blossum <- function() {
+    data_Matrix = c(
+               4,  0, -2, -1, -2,  0, -2, -1, -1, -1, -1, -2, -1, -1, -1,  1,  0,  0, -3, -2,  0,
+               0,  9, -3, -4, -2, -3, -3, -1, -3, -1, -1, -3, -3, -3, -3, -1, -1, -1, -2, -2,  0,
+              -2, -3,  6,  2, -3, -1, -1, -3, -1, -4, -3,  1, -1,  0, -2,  0, -1, -3, -4, -3,  0,
+              -1, -4,  2,  5, -3, -2,  0, -3,  1, -3, -2,  0, -1,  2,  0,  0, -1, -2, -3, -2,  0,
+              -2, -2, -3, -3,  6, -3, -1,  0, -3,  0,  0, -3, -4, -3, -3, -2, -2, -1,  1,  3,  0,
+               0, -3, -1, -2, -3,  6, -2, -4, -2, -4, -3,  0, -2, -2, -2,  0, -2, -3, -2, -3,  0,
+              -2, -3, -1,  0, -1, -2,  8, -3, -1, -3, -2,  1, -2,  0,  0, -1, -2, -3, -2,  2,  0,
+              -1, -1, -3, -3,  0, -4, -3,  4, -3,  2,  1, -3, -3, -3, -3, -2, -1,  3, -3, -1,  0,
+              -1, -3, -1,  1, -3, -2, -1, -3,  5, -2, -1,  0, -1,  1,  2,  0, -1, -2, -3, -2,  0,
+              -1, -1, -4, -3,  0, -4, -3,  2, -2,  4,  2, -3, -3, -2, -2, -2, -1,  1, -2, -1,  0,
+              -1, -1, -3, -2,  0, -3, -2,  1, -1,  2,  5, -2, -2,  0, -1, -1, -1,  1, -1, -1,  0,
+              -2, -3,  1,  0, -3,  0,  1, -3,  0, -3, -2,  6, -2,  0,  0,  1,  0, -3, -4, -2,  0,
+              -1, -3, -1, -1, -4, -2, -2, -3, -1, -3, -2, -2,  7, -1, -2, -1, -1, -2, -4, -3,  0,
+              -1, -3,  0,  2, -3, -2,  0, -3,  1, -2,  0,  0, -1,  5,  1,  0, -1, -2, -2, -1,  0,
+              -1, -3, -2,  0, -3, -2,  0, -3,  2, -2, -1,  0, -2,  1,  5, -1, -1, -3, -3, -2,  0,
+               1, -1,  0,  0, -2,  0, -1, -2,  0, -2, -1,  1, -1,  0, -1,  4,  1, -2, -3, -2,  0,
+               0, -1, -1, -1, -2, -2, -2, -1, -1, -1, -1,  0, -1, -1, -1,  1,  5,  0, -2, -2,  0,
+               0, -1, -3, -2, -1, -3, -3,  3, -2,  1,  1, -3, -2, -2, -3, -2,  0,  4, -3, -1,  0,
+              -3, -2, -4, -3,  1, -2, -2, -3, -3, -2, -1, -4, -4, -2, -3, -3, -2, -3, 11,  2,  0,
+              -2, -2, -3, -2,  3, -3,  2, -1, -2, -1, -1, -2, -3, -1, -2, -2, -2, -1,  2,  7,  0,
+               0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+               )
+
+    Blossum_Matrix = matrix(data_Matrix, nrow=21, ncol=21)
+    nameVector = c('A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', '-')
+    
+    colnames(Blossum_Matrix) = nameVector
+    rownames(Blossum_Matrix) = nameVector
+    
+    return(Blossum_Matrix)
+}
+
 
 Poisson_dist <- function (seq1, seq2) {
     dist = 0
@@ -80,7 +116,49 @@ optimize <- function (seqObj) {
     
     sorted_dist = sort(dist_val)
     optimize_dist = relative_distance(distance, sorted_dist)
+    
+    return(optimize_dist)
 }
+
+
+
+#thetaCfunc <- function (optimize_dist) {
+#    valTheta = c()
+#    for (i in 1:length(names(optimize_dist))) {
+#        valTheta = c(valTheta, optimize_dist[names(optimize_dist[i])])
+#    }
+#
+#    return(mean(valTheta))
+#}
+
+
+thetaEK <- function (aliObj) {
+    bmat = Blossum()
+    posList = list()
+    for (i in 1:length(aliObj[names(aliObj[1])])) {
+        storeName = c()
+        data = c()
+        for (m in 1:length(names(aliObj))) {
+            storeName = c(storeName, names(aliObj[m]))
+            inAliObj = aliObj[!names(aliObj) %in% storeName]
+            for (n in 1:length(names(inAliObj))) {
+                data = c(data, bmat[sapply(aliObj[[names(aliObj)[m]]], as.character), sapply(inAliObj[[names(inAliObj)[n]]], as.character)])
+            }
+        }
+        posList[[paste(pos, i, sep = '')]] = data
+    }
+    
+    return(posList)
+}
+
+
+
+thetaC <- 
+
+
+
+
+
 
 
 
