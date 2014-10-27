@@ -155,7 +155,7 @@ thetaEK <- function (aliObj, optimize_dist) {
 
 thetaC <- function (thetaEKVals) {
     allTheta = c()
-    for (i in length(names(thetaEKVals))) {
+    for (i in 1:length(names(thetaEKVals))) {
         for (theta in thetaEKVals[names(thetaEKVals)[i]]) {
             allTheta = c(allTheta, theta)
         }
@@ -164,6 +164,27 @@ thetaC <- function (thetaEKVals) {
 }
 
 
+variability <- function (thetaEKVals, meanThetaEK) {
+    for (i in 1:length(names(thetaEKVals))) {
+        for (i in thetaEKVals[names(thetaEKVals)[i]]) {
+            thetaEKVals[[names(thetaEKVals)[i]]][j] = (thetaEKVals[[names(thetaEKVals)[i]]][j] - meanThetaEK)^2
+        }
+    }
+    
+    return(thetaEKVals)
+}
+
+
+meanVariability <- function(variabilityData) {
+    allVar = c()
+    for (i in 1:length(names(variabilityData))) {
+        for (var in variabilityData[names(variabilityData)[i]]) {
+            allVar = c(allVar, var)
+        }
+    }
+    
+    return(mean(allVar))
+}
 
 
 
