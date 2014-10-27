@@ -187,8 +187,18 @@ meanVariability <- function(variabilityData) {
 }
 
 
-correlation(variability) {
+correlation(variability, mvar) {
     corData = list()
+    storeName = c()
+    for (i in length(names(variability))) {
+        storeName = c(storeName, names(variability[i]))
+        inVariability = variability[!names(variability) %in% storeName]
+        for (j in length(names(inVariability))) {
+            corData[[paste(names(variability)[i], names(inVariability)[j]), sep='-']] = cor(variability[names(variability)[i]], inVariability[names(inVariability)[j]])
+        }
+    }
+    
+    return(corData)
 }
 
 
