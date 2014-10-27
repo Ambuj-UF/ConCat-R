@@ -187,7 +187,9 @@ meanVariability <- function(variabilityData) {
 }
 
 
-
+correlation(variability) {
+    corData = list()
+}
 
 
 
