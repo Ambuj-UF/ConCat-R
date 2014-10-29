@@ -204,6 +204,15 @@ correlation(variability, mvar) {
 
 
 
+corAllSite <- function (corData) {
+    allCor = c()
+    for (i in 1:length(names(corData))) {
+        allCor = c(allCor, corData[names(corData)[i]])
+    }
+    
+    return(c(mean(allCor), var(allCor)))
+}
+
 
 
 
