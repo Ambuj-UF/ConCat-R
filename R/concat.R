@@ -24,8 +24,8 @@
 ################################################################################################################
 
 
-library(seqinr)
 
+library(seqinr)
 
 read.nex <- function (file)
 {
@@ -150,7 +150,6 @@ read.nex <- function (file)
     Obj <- lapply(Obj, tolower)
     Obj
 }
-
 
 write.nexus <- function (x, file, format = "dna", datablock = TRUE,
 interleaved = TRUE, charsperline = NULL,
@@ -406,7 +405,6 @@ baseConCat <- function(dataFileExtension, fileFormat){
 }
 
 
-
 nexConCat <- function(dataFileExtension, fileFormat) {
     nexFiles = list.files(pattern=dataFileExtension)
     speciesAll = c()
@@ -481,7 +479,8 @@ nexConCat <- function(dataFileExtension, fileFormat) {
     
     return(concatFrame)
 }
-
+#' Class \code{"concat"}
+#' @export
 concat <- function (ext, form, writeData) {
     if (form == 'nexus') {
         outData = nexConCat(ext, 'nexus')
@@ -501,6 +500,15 @@ concat <- function (ext, form, writeData) {
     }
     return(outData)
 }
+
+
+fetchcds <- function(gene, group=NULL) {
+    if (group != NULL) {
+        term = paste(paste(gene, "[sym]", sep=""), paste(group, "[orgn]", sep=""), sep=" ")
+        e <- esearch(term, "gene")
+    }
+}
+
 
 
 
