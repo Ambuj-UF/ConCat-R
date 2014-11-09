@@ -1,3 +1,7 @@
+# reutils method
+# YEAR: 2014
+# COPYRIGHT HOLDER: Gerhard Schöfl
+
 #' @include eutil.R
 NULL
 

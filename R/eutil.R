@@ -1,3 +1,6 @@
+#  reutils method
+#  YEAR: 2014
+#  COPYRIGHT HOLDER: Gerhard Schöfl
 #' @include eutil-error.R
 #' @importFrom RCurl basicHeaderGatherer basicTextGatherer postForm getURLContent curlEscape
 NULL
