@@ -502,12 +502,6 @@ concat <- function (ext, form, writeData) {
 }
 
 
-fetchcds <- function(gene, group=NULL) {
-    if (group != NULL) {
-        term = paste(paste(gene, "[sym]", sep=""), paste(group, "[orgn]", sep=""), sep=" ")
-        e <- esearch(term, "gene")
-    }
-}
 
 
 

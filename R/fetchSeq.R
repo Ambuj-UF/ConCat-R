@@ -19,23 +19,36 @@
 #                                                                                                              #
 ################################################################################################################
 
-#bwt <- function(s) {
-#Apply Burrows-Wheeler transform to input string
+#' require(RCurl)
+#' require(XML)
 
-#    stopifnot(grepl('\0', s) == TRUE)
-#    s = paste(s, "\0")
-#    table = c()
-#    for (i in c(1:length(s))){
-#        table = c(table, paste(substr(x, i, length(s)), substr(x, 1, length(s))))
-#    }
-#
-#    table = sort(table)
-#    last_column = c()
-#    for (row in table){
-#        last_column = c(last_column, paste(substr(row, length(row), length(row)), substr(row, 1, length(row))))
-#    }
+searchcds <- function(gene, group=NULL) {
+    if (group != NULL) {
+        term = paste(paste(gene, "[sym]", sep=""), paste(group, "[orgn]", sep=""), sep=" ")
+        e <- esearch(term, "gene")
+    }
+    
+    return(e)
+}
 
-#    return(do.call(paste, c(as.list(last_column), sep="")))
-#}
+fetchIDs <- function(url) {
+    webpage <- getURL(url)
+    webpage <- readLines(tc <- textConnection(webpage)); close(tc)
+    pagetree <- htmlTreeParse(webpage, error=function(...){}, useInternalNodes = TRUE)
+    x <- xpathSApply(pagetree, "//*", xmlValue)
+    x <- unlist(strsplit(x, "\n"))
+    x <- gsub("\t","",x)
+    x <- sub("^[[:space:]]*(.*?)[[:space:]]*$", "\\1", x, perl=TRUE)
+    x <- x[!(x %in% c("", "|"))]
+
+    idList = c()
+    for (lines %in% x) {
+        if ('→' %in% lines and !(':' %in% lines)) {
+            idList = c(idList, str_replace_all(lines.strsplit(lines, '→')[1], " ", ""))
+        }
+    }
+    
+    return(idList)
+}
 
 
