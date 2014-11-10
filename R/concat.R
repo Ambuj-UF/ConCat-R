@@ -27,6 +27,8 @@
 
 library(seqinr)
 
+#' Class \code{"read-nexus"}
+#' @export
 read.nex <- function (file)
 {
     find.ntax <- function (x)
@@ -122,6 +124,7 @@ read.nex <- function (file)
                 chars.done <- k
             }
         }
+
         tot.ntax <- tot.ntax + 1
         if (tot.ntax == ntax) {
             i <- 1
@@ -137,10 +140,12 @@ read.nex <- function (file)
             i <- i + 1
         }
     }
+    
     if (tot.ntax != 0) {
         cat("ntax:",ntax,"differ from actual number of taxa in file?\n")
         stop("nexus parser did not read names correctly (tot.ntax!=0)")
     }
+    
     for (i in 1:length(Obj)) {
         if (length(Obj[[i]]) != nchar) {
             cat(names(Obj[i]),"has",length(Obj[[i]]),"characters\n")
@@ -151,167 +156,8 @@ read.nex <- function (file)
     Obj
 }
 
-write.nexus <- function (x, file, format = "dna", datablock = TRUE,
-interleaved = TRUE, charsperline = NULL,
-gap = NULL, missing = NULL)
-{
-    
-    indent          <- "  "  # Two blanks
-    maxtax          <- 5     # Max nr of taxon names to be printed on a line
-    defcharsperline <- 80    # Default nr of characters per line if interleaved
-    defgap          <- "-"   # Default gap character
-    defmissing      <- "?"   # Default missing data character
-    
-    ntax <- length(x)
-    nchars <- length(x[[1]])
-    zz <- file(file, "w")
-    
-    if (is.null(names(x))) {
-        names(x) <- as.character(1:ntax)
-    }
-    
-    fcat <- function (..., file = zz)
-    {
-        cat(..., file = file, sep = "", append = TRUE)
-    }
-    
-    find.max.length <- function (x)
-    {
-        max <- 0
-        for (i in 1:length(x)) {
-            val <- length((strsplit(x[i], split = NULL))[[1]])
-            if (val > max) {
-                max <- val
-            }
-        }
-        max
-    }
-    
-    print.matrix <- function(x, dindent = "    ")
-    {
-        Names <- names(x)
-        printlength <- find.max.length(Names) + 2
-        if (interleaved == FALSE) {
-            for (i in 1:length(x)) {
-                sequence <- paste(x[[i]], collapse = "")
-                taxon <- Names[i]
-                thestring <- sprintf("%-*s%s%s", printlength, taxon, dindent, sequence)
-                fcat(indent, indent, thestring, "\n")
-            }
-        }
-        else {
-            ntimes <- ceiling(nchars/charsperline)
-            start <- 1
-            end <- charsperline
-            for (j in 1:ntimes) {
-                for (i in 1:length(x)) {
-                    sequence <- paste(x[[i]][start:end], collapse = "")
-                    taxon <- Names[i]
-                    thestring <- sprintf("%-*s%s%s", printlength, taxon, dindent, sequence)
-                    fcat(indent, indent, thestring, "\n")
-                }
-                if (j < ntimes) {
-                    fcat("\n")
-                }
-                start <- start + charsperline
-                end <- end + charsperline
-                if (end > nchars) {
-                    end <- nchars
-                }
-            }
-        }
-    }
-    
-    fcat("#NEXUS\n[Data written by write.nexus.data.R,", " ", date(),"]\n")
-    
-    NCHAR <- paste("NCHAR=", nchars, sep = "")
-    NTAX <- paste("NTAX=", ntax, sep = "")
-    
-    if (format == "dna") {
-        DATATYPE <- "DATATYPE=DNA"
-    }
-    if (format == "protein") {
-        DATATYPE <- "DATATYPE=PROTEIN"
-    }
-    
-    if (is.null(charsperline)) {
-        if (nchars < defcharsperline) {
-            charsperline <- nchars
-            interleaved <- FALSE
-        }
-        else {
-            if (nchars > defcharsperline) {
-                charsperline <- defcharsperline
-            }
-        }
-    }
-    
-    if (is.null(missing)) {
-        MISSING <- paste("MISSING=", defmissing, sep = "")
-    }
-    else {
-        MISSING <- paste("MISSING=", missing, sep = "")
-    }
-    
-    if (is.null(gap)) {
-        GAP <- paste("GAP=", defgap, sep = "")
-    }
-    else {
-        GAP <- paste("GAP=", gap, sep = "")
-    }
-    
-    if (interleaved == TRUE) {
-        INTERLEAVE <- "INTERLEAVE=YES"
-    }
-    if (interleaved == FALSE) {
-        INTERLEAVE <- "INTERLEAVE=NO"
-    }
-    
-    if (datablock == TRUE) {
-        fcat("BEGIN DATA;\n")
-        fcat(indent,"DIMENSIONS", " ", NTAX, " ", NCHAR, ";\n")
-        if (format %in% c("dna", "protein")) {
-            fcat(indent, "FORMAT", " ", DATATYPE, " ", MISSING, " ", GAP, " ", INTERLEAVE, ";\n") # from François Michonneau (2009-10-02)
-        }
-        fcat(indent,"MATRIX\n")
-        print.matrix(x)
-        fcat(indent, ";\n")
-        fcat("END;\n\n")
-    }
-    else {
-        fcat("BEGIN TAXA;\n")
-        fcat(indent, "DIMENSIONS", " ", NTAX, ";\n")
-        fcat(indent, "TAXLABELS\n")
-        fcat(indent, indent)
-        j <- 0
-        for (i in 1:ntax) {
-            fcat(names(x[i]), " ")
-            j <- j + 1
-            if (i == ntax) {
-                fcat("\n", indent, ";\n")
-            }
-            else {
-                if (j == maxtax) {
-                    fcat("\n", indent, indent)
-                    j <- 0
-                }
-            }
-        }
-        fcat("END;\n\n")
-        fcat("BEGIN CHARACTERS;\n")
-        fcat(indent, "DIMENSIONS", " ", NCHAR, ";\n")
-        if (format %in% c("dna", "protein")) {
-            fcat(indent, "FORMAT", " ", MISSING, " ", GAP, " ", DATATYPE, " ", INTERLEAVE, ";\n")
-        }
-        fcat(indent,"MATRIX\n")
-        print.matrix(x)
-        fcat(indent, ";")
-        fcat("\nEND;\n\n")
-    }
-    close(zz)
-}
-
-
+#' Class \code{"concat-functions"}
+#' @export
 insertRow <- function(existingDF, newrow, r) {
     existingDF <- rbind(existingDF,setNames(newrow, names(existingDF)))
     existingDF <- existingDF[order(c(1:(nrow(existingDF)-1),r-0.5)),]
@@ -319,7 +165,8 @@ insertRow <- function(existingDF, newrow, r) {
     return(existingDF)
 }
 
-
+#' Class \code{"concat-functions"}
+#' @export
 baseConCat <- function(dataFileExtension, fileFormat){
     files = list.files(pattern=dataFileExtension)
     dataObject = data.frame("FileName"='Test',"Species"='Test',"Sequence"='Test')
@@ -335,8 +182,6 @@ baseConCat <- function(dataFileExtension, fileFormat){
             x = x + 1
         }
     }
-    
-    
     
     newDataObject = new.env()
     
@@ -404,15 +249,15 @@ baseConCat <- function(dataFileExtension, fileFormat){
     return(concatFrame)
 }
 
-
+#' Class \code{"concat-functions"}
+#' @export
 nexConCat <- function(dataFileExtension, fileFormat) {
     nexFiles = list.files(pattern=dataFileExtension)
     speciesAll = c()
     dataObject = data.frame("FileName" = 'Test', "Species" = 'Test', "Sequence" = 'Test')
     for (filename in nexFiles) {
-        nexData = read.nex(filename)
+        nexData = tryCatch({read.nex(filename)}, finally = {print(filename)})
         speciesAll = c(speciesAll, names(nexData))
-        
         for (i in 1:length(nexData)) {
             dataObject = insertRow(dataObject, data.frame("FileName" = filename, "Species" = names(nexData[i]), "Sequence" = paste(nexData[[names(nexData[i])]], collapse="")), 1)
         }
@@ -479,30 +324,28 @@ nexConCat <- function(dataFileExtension, fileFormat) {
     
     return(concatFrame)
 }
-#' Class \code{"concat"}
+
+#' Class \code{"concat-functions"}
 #' @export
-concat <- function (ext, form, writeData) {
+#' Usage x=concat('.nex', 'nexus', writeData=TRUE)
+#' Usage x=concat('.fas', 'fasta', writeData=TRUE)
+
+concat <- function (ext, form, writeData=TRUE) {
     if (form == 'nexus') {
         outData = nexConCat(ext, 'nexus')
-        if (writeData == TRUE) {
-            writeDataObj = list()
-            for (i in 1:length(outData)) {
-                writeDataObj[[outData[i,][2]]] = strsplit(sapply(outData[i,][3], as.character), '')
-            }
-            write.nexus(writeDataObj, file="FuncOutput.nex", format = "dna", datablock = TRUE, interleaved = TRUE)
-        }
     }
     else {
         outData = baseConCat(ext, form)
-        if (writeData == TRUE) {
-            write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "FuncOutput.fas", open = 'w')
-        }
     }
+    if (writeData == TRUE) {
+        write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "Output.fas", open = 'w')
+    }
+    
     return(outData)
 }
 
 
-
+x=concat('.nex', 'nexus', writeData=TRUE)
 
 
 
