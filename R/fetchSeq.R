@@ -52,3 +52,17 @@ fetchIDs <- function(url) {
 }
 
 
+fetchSeq <- function(ID, type) {
+    if (type == 'cds' or type == 'CDS') {
+        x <- efetch(ID, "nuccore", rettype = "fasta_cds_na", retmode = "text")
+    }
+    else if(type == 'amino acid') {
+        x <- efetch(ID, "nuccore", rettype = "fasta_cds_aa", retmode = "text")
+    }
+    else {x <- efetch(ID, "nuccore", rettype = "fasta", retmode = "text")}
+
+    return(x)
+    
+}
+
+
