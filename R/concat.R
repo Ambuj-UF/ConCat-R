@@ -1,8 +1,8 @@
 ################################################################################################################
 #                                                                                                              #
 # Copyright (C) {2014}  {Ambuj Kumar, Kimball-Brain lab group, Biology Department, University of Florida}      #
-#                                                                                                              #
-# "read.nex" and "write.nexus" is a Simplified NEXUS data parser by Johan Nylander, nylander @ scs.fsu.edu     #
+#                       {Mrinal Mishra, VTT Technical Research Center, Finland}                                #
+# "read.nex" and write.nex are Simplified NEXUS data parser by Johan Nylander, nylander @ scs.fsu.edu          #
 # WARNING: This is parser reads a restricted nexus format, see the link below for details                      #
 # http://svitsrv25.epfl.ch/R-doc/library/ape/html/read.nexus.data.html &                                       #
 # http://www.inside-r.org/packages/cran/ape/docs/write.nexus.data                                              #
@@ -29,6 +29,8 @@ library(seqinr)
 
 #' Class \code{"read-nexus"}
 #' @export
+
+
 read.nex <- function (file)
 {
     find.ntax <- function (x)
@@ -124,7 +126,7 @@ read.nex <- function (file)
                 chars.done <- k
             }
         }
-
+        
         tot.ntax <- tot.ntax + 1
         if (tot.ntax == ntax) {
             i <- 1
@@ -155,6 +157,306 @@ read.nex <- function (file)
     Obj <- lapply(Obj, tolower)
     Obj
 }
+
+# Nexus data parser.
+#
+# Version: 09/13/2006 09:06:33 AM CEST
+#
+# By:      Johan Nylander, nylander @ scs.fsu.edu
+#
+# TODO:    Standard data, mixed data, nice indent
+#------------------------------------------------------------------
+
+"write.nex" <- function (x, file, format = "dna", datablock = TRUE,
+interleaved = TRUE, charsperline = NULL,
+gap = NULL, missing = NULL)
+{
+    
+    indent          <- "  "  # Two blanks
+    maxtax          <- 5     # Max nr of taxon names to be printed on a line
+    defcharsperline <- 80    # Default nr of characters per line if interleaved
+    defgap          <- "-"   # Default gap character
+    defmissing      <- "?"   # Default missing data character
+    
+    ntax <- length(x)
+    nchars <- length(x[[1]])
+    zz <- file(file, "w")
+    
+    if (is.null(names(x))) {
+        names(x) <- as.character(1:ntax)
+    }
+    
+    "fcat" <- function (..., file = zz)
+    {
+        cat(..., file = file, sep = "", append = TRUE)
+    }
+    
+    "find.max.length" <- function (x)
+    {
+        max <- 0
+        for (i in 1:length(x)) {
+            val <- length((strsplit(x[i], split = NULL))[[1]])
+            if (val > max) {
+                max <- val
+            }
+        }
+        max
+    }
+    
+    "print.matrix" <- function(x, dindent = "    ")
+    {
+        Names <- names(x)
+        printlength <- find.max.length(Names) + 2
+        if (interleaved == FALSE) {
+            for (i in 1:length(x)) {
+                sequence <- paste(x[[i]], collapse = "")
+                taxon <- Names[i]
+                thestring <- sprintf("%-*s%s%s", printlength, taxon, dindent, sequence)
+                fcat(indent, indent, thestring, "\n")
+            }
+        }
+        else {
+            ntimes <- ceiling(nchars/charsperline)
+            start <- 1
+            end <- charsperline
+            for (j in 1:ntimes) {
+                for (i in 1:length(x)) {
+                    sequence <- paste(x[[i]][start:end], collapse = "")
+                    taxon <- Names[i]
+                    thestring <- sprintf("%-*s%s%s", printlength, taxon, dindent, sequence)
+                    fcat(indent, indent, thestring, "\n")
+                }
+                if (j < ntimes) {
+                    fcat("\n")
+                }
+                start <- start + charsperline
+                end <- end + charsperline
+                if (end > nchars) {
+                    end <- nchars
+                }
+            }
+        }
+    }
+    
+    fcat("#NEXUS\n[Data written by write.nexus.data.R,", " ", date(),"]\n")
+    
+    NCHAR <- paste("NCHAR=", nchars, sep = "")
+    NTAX <- paste("NTAX=", ntax, sep = "")
+    
+    if (format == "dna") {
+        DATATYPE <- "DATATYPE=DNA"
+    }
+    if (format == "protein") {
+        DATATYPE <- "DATATYPE=PROTEIN"
+    }
+    
+    if (is.null(charsperline)) {
+        if (nchars < defcharsperline) {
+            charsperline <- nchars
+            interleaved <- FALSE
+        }
+        else {
+            if (nchars > defcharsperline) {
+                charsperline <- defcharsperline
+            }
+        }
+    }
+    
+    if (is.null(missing)) {
+        MISSING <- paste("MISSING=", defmissing, sep = "")
+    }
+    else {
+        MISSING <- paste("MISSING=", missing, sep = "")
+    }
+    
+    if (is.null(gap)) {
+        GAP <- paste("GAP=", defgap, sep = "")
+    }
+    else {
+        GAP <- paste("GAP=", gap, sep = "")
+    }
+    
+    if (interleaved == TRUE) {
+        INTERLEAVE <- "INTERLEAVE=YES"
+    }
+    if (interleaved == FALSE) {
+        INTERLEAVE <- "INTERLEAVE=NO"
+    }
+    
+    if (datablock == TRUE) {
+        fcat("BEGIN DATA;\n")
+        fcat(indent,"DIMENSIONS", " ", NTAX, " ", NCHAR, ";\n")
+        if (format %in% c("dna", "protein")) {
+            fcat(indent, "FORMAT", " ", DATATYPE, " ", MISSING, " ", GAP, " ", INTERLEAVE, ";\n") # from FranÁois Michonneau (2009-10-02)
+        }
+        fcat(indent,"MATRIX\n")
+        print.matrix(x)
+        fcat(indent, ";\n")
+        fcat("END;\n\n")
+    }
+    else {
+        fcat("BEGIN TAXA;\n")
+        fcat(indent, "DIMENSIONS", " ", NTAX, ";\n")
+        fcat(indent, "TAXLABELS\n")
+        fcat(indent, indent)
+        j <- 0
+        for (i in 1:ntax) {
+            fcat(names(x[i]), " ")
+            j <- j + 1
+            if (i == ntax) {
+                fcat("\n", indent, ";\n")
+            }
+            else {
+                if (j == maxtax) {
+                    fcat("\n", indent, indent)
+                    j <- 0
+                }
+            }
+        }
+        fcat("END;\n\n")
+        fcat("BEGIN CHARACTERS;\n")
+        fcat(indent, "DIMENSIONS", " ", NCHAR, ";\n")
+        if (format %in% c("dna", "protein")) {
+            fcat(indent, "FORMAT", " ", MISSING, " ", GAP, " ", DATATYPE, " ", INTERLEAVE, ";\n")
+        }
+        fcat(indent,"MATRIX\n")
+        print.matrix(x)
+        fcat(indent, ";")
+        fcat("\nEND;\n\n")
+    }
+    close(zz)
+}
+
+##   Write DNA Sequences in a File
+
+## Copyright 2003-2012 Emmanuel Paradis
+
+## This file is part of the R-package `ape'.
+## See the file ../COPYING for licensing issues.
+
+write.dna <- function(x, file, format = "interleaved", append = FALSE,
+nbcol = 6, colsep = " ", colw = 10, indent = NULL,
+blocksep = 1)
+{
+    format <- match.arg(format, c("interleaved", "sequential", "fasta"))
+    phylip <- if (format %in% c("interleaved", "sequential")) TRUE else FALSE
+    if (inherits(x, "DNAbin")) x <- as.character(x)
+    aligned <- TRUE
+    if (is.matrix(x)) {
+        N <- dim(x)
+        S <- N[2]
+        N <- N[1]
+        xx <- vector("list", N)
+        for (i in 1:N) xx[[i]] <- x[i, ]
+        names(xx) <- rownames(x)
+        x <- xx
+        rm(xx)
+    } else {
+        N <- length(x)
+        S <- unique(unlist(lapply(x, length)))
+        if (length(S) > 1) aligned <- FALSE
+    }
+    if (is.null(names(x))) names(x) <- as.character(1:N)
+    if (is.null(indent))
+    indent <- if (phylip) 10 else  0
+    if (is.numeric(indent))
+    indent <- paste(rep(" ", indent), collapse = "")
+    if (format == "interleaved") {
+        blocksep <- paste(rep("\n", blocksep), collapse = "")
+        if (nbcol < 0) format <- "sequential"
+    }
+    zz <- if (append) file(file, "a") else file(file, "w")
+    on.exit(close(zz))
+    if (phylip) {
+        if (!aligned)
+        stop("sequences must have the same length for
+        interleaved or sequential format.")
+        cat(N, " ", S, "\n", sep = "", file = zz)
+        if (nbcol < 0) {
+            nb.block <- 1
+            nbcol <- totalcol <- ceiling(S/colw)
+        } else {
+            nb.block <- ceiling(S/(colw * nbcol))
+            totalcol <- ceiling(S/colw)
+        }
+        ## Prepare the sequences in a matrix whose elements are
+        ## strings with `colw' characters.
+        SEQ <- matrix("", N, totalcol)
+        for (i in 1:N) {
+            X <- paste(x[[i]], collapse = "")
+            for (j in 1:totalcol)
+            SEQ[i, j] <- substr(X, 1 + (j - 1)*colw, colw + (j - 1)*colw)
+        }
+        ## Prepare the names so that they all have the same nb of chars
+        max.nc <- max(nchar(names(x)))
+        ## always put a space between the sequences and the taxa names
+        fmt <- paste("%-", max.nc + 1, "s", sep = "")
+        names(x) <- sprintf(fmt, names(x))
+    }
+    switch(format, "interleaved" = {
+        ## Write the first block with the taxon names
+        colsel <- if (nb.block == 1) 1:totalcol else 1:nbcol
+        for (i in 1:N) {
+            cat(names(x)[i], file = zz)
+            cat(SEQ[i, colsel], sep = colsep, file = zz)
+            cat("\n", file = zz)
+        }
+        ## Write eventually the other blocks
+        if (nb.block > 1) {
+            for (k in 2:nb.block) {
+                cat(blocksep, file = zz)
+                endcolsel <- if (k == nb.block) totalcol else nbcol + (k - 1)*nbcol
+                for (i in 1:N) {
+                    cat(indent, file = zz)
+                    cat(SEQ[i, (1 + (k - 1)*nbcol):endcolsel], sep = colsep, file = zz)
+                    cat("\n", file = zz)
+                }
+            }
+        }
+        
+    }, "sequential" = {
+        if (nb.block == 1) {
+            for (i in 1:N) {
+                cat(names(x)[i], file = zz)
+                cat(SEQ[i, ], sep = colsep, file = zz)
+                cat("\n", file = zz)
+            }
+        } else {
+            for (i in 1:N) {
+                cat(names(x)[i], file = zz)
+                cat(SEQ[i, 1:nbcol], sep = colsep, file = zz)
+                cat("\n", file = zz)
+                for (k in 2:nb.block) {
+                    endcolsel <- if (k == nb.block) totalcol else nbcol + (k - 1)*nbcol
+                    cat(indent, file = zz)
+                    cat(SEQ[i, (1 + (k - 1)*nbcol):endcolsel], sep = colsep, file = zz)
+                    cat("\n", file = zz)
+                }
+            }
+        }
+    }, "fasta" = {
+        for (i in 1:N) {
+            cat(">", names(x)[i], file = zz, sep = "")
+            cat("\n", file = zz)
+            X <- paste(x[[i]], collapse = "")
+            S <- length(x[[i]])
+            totalcol <- ceiling(S/colw)
+            if (nbcol < 0) nbcol <- totalcol
+            nb.lines <- ceiling(totalcol/nbcol)
+            SEQ <- character(totalcol)
+            for (j in 1:totalcol)
+            SEQ[j] <- substr(X, 1 + (j - 1) * colw, colw + (j - 1) * colw)
+            for (k in 1:nb.lines) {
+                endsel <-
+                if (k == nb.lines) length(SEQ) else nbcol + (k - 1)*nbcol
+                cat(indent, file = zz)
+                cat(SEQ[(1 + (k - 1)*nbcol):endsel], sep = colsep, file = zz)
+                cat("\n", file = zz)
+            }
+        }
+    })
+}
+
 
 #' Class \code{"concat-functions"}
 #' @export
@@ -330,7 +632,7 @@ nexConCat <- function(dataFileExtension, fileFormat) {
 #' Usage x=concat('.nex', 'nexus', writeData=TRUE)
 #' Usage x=concat('.fas', 'fasta', writeData=TRUE)
 
-concat <- function (ext, form, writeData=TRUE) {
+concat <- function (ext, form, outform,writeData=TRUE) {
     if (form == 'nexus') {
         outData = nexConCat(ext, 'nexus')
     }
@@ -340,12 +642,44 @@ concat <- function (ext, form, writeData=TRUE) {
     if (writeData == TRUE) {
         write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "Output.fas", open = 'w')
     }
+    fasta <- read.alignment("Output.fas", format = "fasta")
+    seq_list=fasta$seq
+    seq_name=fasta$nam
+    seq=list()
+    seq1=list()
+    for (i in 1:length(seq_list)) {
+        seq[[i]]<-sapply(c(strsplit(sapply(seq_list[[i]],as.character),"")),as.character)
+        names(seq)[i]<-as.character(fasta$nam[i])
+        seq1[[i]]<-sapply(c(strsplit(sapply(seq_list[[i]],as.character),"")),as.character)
+        names(seq1)[i]<-as.character(paste(unlist(sapply(strsplit(sapply(seq_name[[i]],as.character),""),as.list)[1:10]),collapse=""))
+    }
     
+    
+    if (outform == 'nexus') {
+        outData= seq
+        write.nex(outData, file= "Output.nex", interleaved = TRUE, charsperline = 100)
+        unlink("Output.fas", recursive = FALSE)
+    }
+    if (outform=='phylip_relaxed'){
+        outData=seq
+        write.dna(outData,file="Output_phy_relaxed.phy" , format = "interleaved")
+        unlink("Output.fas", recursive = FALSE)
+    }
+    if (outform=='phylip_interleaved'){
+        outData=seq1
+        write.dna(outData,file="Output_phy_interleaved.phy" , format = "interleaved")
+        unlink("Output.fas", recursive = FALSE)
+    }
+    if (outform=='phylip_sequential'){
+        outData=seq1
+        write.dna(outData,file="Output_phy_sequential.phy" , format = "sequential")
+        unlink("Output.fas", recursive = FALSE)
+    }
     return(outData)
 }
 
 
-x=concat('.nex', 'nexus', writeData=TRUE)
+x=concat('.nex', 'nexus','phylip_interleaved', writeData=TRUE)
 
 
 

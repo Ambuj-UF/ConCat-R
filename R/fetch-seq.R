@@ -22,9 +22,17 @@
 #' require(RCurl)
 #' require(XML)
 
+
+trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+
 searchcds <- function(gene, group=NULL) {
     if (group != NULL) {
         term = paste(paste(gene, "[sym]", sep=""), paste(group, "[orgn]", sep=""), sep=" ")
+        e <- esearch(term, "gene")
+    }
+    
+    else {
+        term = paste(gene, "[sym]", sep="")
         e <- esearch(term, "gene")
     }
     
@@ -42,9 +50,9 @@ fetchIDs <- function(url) {
     x <- x[!(x %in% c("", "|"))]
 
     idList = c()
-    for (lines %in% x) {
-        if ('→' %in% lines and !(':' %in% lines)) {
-            idList = c(idList, str_replace_all(lines.strsplit(lines, '→')[1], " ", ""))
+    for (lines in x) {
+        if(grepl('→', sapply(lines, as.character)) == TRUE & grepl(':', sapply(lines, as.character)) == FALSE) {
+            idList = c(idList, trim(strsplit(lines, '→')[[1]][1]))
         }
     }
     
@@ -53,7 +61,7 @@ fetchIDs <- function(url) {
 
 
 fetchSeq <- function(ID, type) {
-    if (type == 'cds' or type == 'CDS') {
+    if (type == 'cds' | type == 'CDS') {
         x <- efetch(ID, "nuccore", rettype = "fasta_cds_na", retmode = "text")
     }
     else if(type == 'amino acid') {
@@ -61,8 +69,41 @@ fetchSeq <- function(ID, type) {
     }
     else {x <- efetch(ID, "nuccore", rettype = "fasta", retmode = "text")}
 
-    return(x)
+    return(content(x))
     
+}
+
+
+longestSeq <- function(seqList) {
+    retSeq = seqList[1]
+    for (seq in seqList) {
+        if (getLength(paste(strsplit((seq, '\n')[[1]][2:length(strsplit(seq, '\n')[[1]])], collapse="")) >
+            getLength(paste(strsplit((retSeq, '\n')[[1]][2:getLength(strsplit(retSeq, '\n')[[1]])]), collapse=""))) {
+                retSeq = seq
+        }
+    }
+    
+    return(retSeq)
+}
+
+
+for (geneName in geneList) {
+    ids = searchcds(geneName, group = orgn)
+    totalSeqList = c()
+    for (id in ids) {
+        seqList=c()
+        url = paste("http://www.ncbi.nlm.nih.gov/gene/", id, sep="")
+        idList = unique(fetchIDs(url))
+        for (inID in idList) {
+            seqList = c(seqList, fetchSeq(inID, type))
+        }
+        
+        totalSeqList = c(totalSeqList, longestSeq(seqList))
+    }
+    
+    sink(paste(geneName, ".fas"))
+    
+    for (obj in totalSeqList) {cat(obj)}
 }
 
 
