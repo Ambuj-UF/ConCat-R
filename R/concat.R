@@ -1,7 +1,7 @@
 ################################################################################################################
 #                                                                                                              #
 # Copyright (C) {2014}  {Ambuj Kumar, Kimball-Brain lab group, Biology Department, University of Florida}      #
-#                                                                                                              #
+#                       {Mrinal Mishra, VTT Technical Research Center, Finland}                                #
 # "read.nex" and "write.nexus" is a Simplified NEXUS data parser by Johan Nylander, nylander @ scs.fsu.edu     #
 # WARNING: This is parser reads a restricted nexus format, see the link below for details                      #
 # http://svitsrv25.epfl.ch/R-doc/library/ape/html/read.nexus.data.html &                                       #
