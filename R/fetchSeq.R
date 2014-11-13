@@ -57,9 +57,13 @@ fetchIDs <- function(url) {
         if(grepl('→', sapply(lines, as.character)) == TRUE & grepl(':', sapply(lines, as.character)) == FALSE) {
             idList = c(idList, trim(strsplit(lines, '→')[[1]][1]))
         }
+        else if (grepl(' - Gene - NCBI', sapply(lines, as.character)) == TRUE) {
+            spName = strsplit(strsplit(sapply(lines, as.character), split="\\[")[[1]][2], split="\\]")[[1]][1]
+        }
     }
     
-    return(idList)
+    
+    return(list("id" = idList, "species" = spName))
 }
 
 
@@ -78,7 +82,7 @@ fetchSeq <- function(ID, type) {
 
 
 longestSeq <- function(seqList) {
-    retSeq = seqList[1]
+    retSeq = seqList[[1]]
     for (seq in seqList) {
         seqLength = length(strsplit(seq, '\n')[[1]])
         seqObj = strsplit(seq, '\n')[[1]][2:seqLength]
@@ -88,13 +92,14 @@ longestSeq <- function(seqList) {
                 retSeq = seq
         }
     }
-    
+
     return(retSeq)
 }
 
 
 fetch <- function(geneList, orgn="None") {
     for (geneName in geneList) {
+        cat("Extracting sequence for ", geneName, "")
         ids = searchcds(geneName, orgn)
         
         totalSeqList = c()
@@ -109,19 +114,28 @@ fetch <- function(geneList, orgn="None") {
             
             seqList=c()
             url = paste("http://www.ncbi.nlm.nih.gov/gene/", ids[x], sep="")
-            idList = unique(fetchIDs(url))
+            retObj = fetchIDs(url)
+            idList = unique(retObj["id"]$id)
+            cat(retObj["species"]$species)
+            cat("\n")
             for (inID in idList) {
                 seqList = c(seqList, fetchSeq(inID, 'cds'))
             }
-        
-            totalSeqList = c(totalSeqList, longestSeq(seqList))
+            
+            lseq = longestSeq(seqList)
+            newSeq = strsplit(sapply(lseq, as.character), '\n')
+            newSeq[[1]][1] = paste(strsplit(sapply(retObj["species"]$species, as.character), "\\(")[[1]][1], ">", sep="")
+            newSeq = unlist(newSeq)
+            newSeq = paste(newSeq, sep="\n")
+            totalSeqList = c(totalSeqList, newSeq)
+            
         }
         
         sink(paste(geneName, ".fas"))
-        for (x in 1:length(totalSeqList)) {cat(totalSeqList[x])}
+        for (x in 1:length(totalSeqList)) {cat(sapply(totalSeqList[x], as.character))}
         sink()
     }
 }
 
-fetch('ASPM', "Primates")
+fetch(c('ASPM'), "Primates")
 
