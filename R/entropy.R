@@ -19,17 +19,18 @@
 #                                                                                                              #
 ################################################################################################################
 
-# Calculates fast evolving sites
+# Calculates alignment entropy
 
+require(seqinr)
 
-shannon <- function (Obj) {
+shannon <- function(Obj) {
     totEntVect = c()
     entList = list()
-    for (i in 1:length(d[[1]])) {
+    for (i in 1:getLength(Obj$seq[1])) {
         entList[[i]] = list()
         objects = c()
-        for (j in 1:length(names(Obj))) {
-            objects = c(objects, Obj[[j]][i])
+        for (j in 1:length(Obj$nam)) {
+            objects = c(objects, substring(Obj[j]$seq, i, i))
         }
         
         objects = objects[!objects %in% c('?')]
@@ -55,7 +56,7 @@ shannon <- function (Obj) {
         totEntVect = c(totEntVect, colEntropy)
     }
     
-    entropy = sum(totEntVect)/length(d[[1]])
+    entropy = sum(totEntVect)/getLength(Obj$seq[1])
     return(entropy)
 }
 
@@ -64,11 +65,11 @@ shannon <- function (Obj) {
 shannonProt <- function (Obj) {
     totEntVect = c()
     entList = list()
-    for (i in 1:length(d[[1]])) {
+    for (i in 1:getLength(Obj$seq[1])) {
         entList[[i]] = list()
         objects = c()
-        for (j in 1:length(names(Obj))) {
-            objects = c(objects, Obj[[j]][i])
+        for (j in 1:length(Obj$nam)) {
+            objects = c(objects, substring(Obj[j]$seq, i, i))
         }
         
         objects = objects[!objects %in% c('?')]
@@ -117,8 +118,22 @@ shannonProt <- function (Obj) {
         totEntVect = c(totEntVect, colEntropy)
     }
     
-    entropy = sum(totEntVect)/length(d[[1]])
+    entropy = sum(totEntVect)/getLength(Obj$seq[1])
     return(entropy)
+}
+
+
+entcal <- function(file, type="DNA") {
+    if (type == "DNA" | type == "dna") {
+        alignment = read.alignment("MCPH1.fas", "fasta")
+        ent = shannon(alignment)
+    }
+    else {
+        alignment = read.alignment("MCPH1.fas", "fasta")
+        ent = shannonProt(alignment)
+    }
+    
+    return(ent)
 }
 
 

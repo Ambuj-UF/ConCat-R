@@ -20,13 +20,63 @@
 ################################################################################################################
 
 # RY coding
+# Usage rycode(alignment-Object, type=3)
 
-ryAll <- function (alignmentObject) {
+
+rycode <- function (seqData, type=3) {
+    if (type == 3) {
+        for (i in 1:length(seqData)) {
+            counter = 1
+            for (char in unlist(seqData[[names(seqData[i])]])) {
+                if (counter%%3 == 0) {
+                    if (seqData[[names(seqData[i])]][[1]][counter] == 'a' | seqData[[names(seqData[i])]][[1]][counter] == 'g') {
+                        seqData[[names(seqData[i])]][[1]][counter] = 'r'
+                    }
+                    else if(seqData[[names(seqData[i])]][[1]][counter] == 't' | seqData[[names(seqData[i])]][[1]][counter] == 'c') {
+                        seqData[[names(seqData[i])]][[1]][counter] = 'y'
+                    }
+                    
+                }
+                
+                counter = counter + 1
+            }
+        }
+    }
     
+    else if (type == 'all') {
+        for (i in 1:length(seqData)) {
+            for (char in unlist(seqData[[names(seqData[i])]])) {
+                if (seqData[[names(seqData[i])]][[1]][counter] == 'a' | seqData[[names(seqData[i])]][[1]][counter] == 'g') {
+                    seqData[[names(seqData[i])]][[1]][counter] = 'r'
+                }
+                else if(seqData[[names(seqData[i])]][[1]][counter] == 't' | seqData[[names(seqData[i])]][[1]][counter] == 'c') {
+                    seqData[[names(seqData[i])]][[1]][counter] = 'y'
+                }
+            }
+        }
+    }
+    
+    sink("RYcoded.fas")
+    
+    for (i in 1:length(seqData)) {
+        cat(paste(">",sapply(names(seqData[i]), as.character), sep=""),"\n")
+        cat(paste(unlist(seqData[[names(seqData[i])]])), sep="")
+        cat("\n\n")
+    }
+    
+    sink()
 }
 
-ryThird <- function (alignmentObject) {
-    
-}
+
+
+
+
+
+
+
+
+
+
+
 
 

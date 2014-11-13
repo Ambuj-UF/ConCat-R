@@ -19,14 +19,17 @@
 #                                                                                                              #
 ################################################################################################################
 
-#' require(RCurl)
-#' require(XML)
+require(RCurl)
+require(XML)
+require(reutils)
+require(seqinr)
+
 
 
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
-searchcds <- function(gene, group=NULL) {
-    if (group != NULL) {
+searchcds <- function(gene, group) {
+    if (group != "None") {
         term = paste(paste(gene, "[sym]", sep=""), paste(group, "[orgn]", sep=""), sep=" ")
         e <- esearch(term, "gene")
     }
@@ -54,9 +57,13 @@ fetchIDs <- function(url) {
         if(grepl('→', sapply(lines, as.character)) == TRUE & grepl(':', sapply(lines, as.character)) == FALSE) {
             idList = c(idList, trim(strsplit(lines, '→')[[1]][1]))
         }
+        else if (grepl(' - Gene - NCBI', sapply(lines, as.character)) == TRUE) {
+            spName = strsplit(strsplit(sapply(lines, as.character), split="\\[")[[1]][2], split="\\]")[[1]][1]
+        }
     }
     
-    return(idList)
+    
+    return(list("id" = idList, "species" = spName))
 }
 
 
@@ -75,35 +82,60 @@ fetchSeq <- function(ID, type) {
 
 
 longestSeq <- function(seqList) {
-    retSeq = seqList[1]
+    retSeq = seqList[[1]]
     for (seq in seqList) {
-        if (getLength(paste(strsplit((seq, '\n')[[1]][2:length(strsplit(seq, '\n')[[1]])], collapse="")) >
-            getLength(paste(strsplit((retSeq, '\n')[[1]][2:getLength(strsplit(retSeq, '\n')[[1]])]), collapse=""))) {
+        seqLength = length(strsplit(seq, '\n')[[1]])
+        seqObj = strsplit(seq, '\n')[[1]][2:seqLength]
+        retSeqLength = length(strsplit(retSeq, '\n')[[1]])
+        retSeqObj = strsplit(retSeq, '\n')[[1]][2:retSeqLength]
+        if (getLength(paste(seqObj, collapse="")) > getLength(paste(retSeqObj, collapse=""))) {
                 retSeq = seq
         }
     }
-    
+
     return(retSeq)
 }
 
 
-for (geneName in geneList) {
-    ids = searchcds(geneName, group = orgn)
-    totalSeqList = c()
-    for (id in ids) {
-        seqList=c()
-        url = paste("http://www.ncbi.nlm.nih.gov/gene/", id, sep="")
-        idList = unique(fetchIDs(url))
-        for (inID in idList) {
-            seqList = c(seqList, fetchSeq(inID, type))
+fetch <- function(geneList, orgn="None") {
+    for (geneName in geneList) {
+        cat("Extracting sequence for ", geneName, "")
+        ids = searchcds(geneName, orgn)
+        
+        totalSeqList = c()
+        idData = c()
+        
+        for (x in 1:1000) {
+            if (!is.na(ids[x])) {lenID = x}
+                else {break}
         }
         
-        totalSeqList = c(totalSeqList, longestSeq(seqList))
+        for (x in 1:lenID) {
+            
+            seqList=c()
+            url = paste("http://www.ncbi.nlm.nih.gov/gene/", ids[x], sep="")
+            retObj = fetchIDs(url)
+            idList = unique(retObj["id"]$id)
+            cat(retObj["species"]$species)
+            cat("\n")
+            for (inID in idList) {
+                seqList = c(seqList, fetchSeq(inID, 'cds'))
+            }
+            
+            lseq = longestSeq(seqList)
+            newSeq = strsplit(sapply(lseq, as.character), '\n')
+            newSeq[[1]][1] = paste(strsplit(sapply(retObj["species"]$species, as.character), "\\(")[[1]][1], ">", sep="")
+            newSeq = unlist(newSeq)
+            newSeq = paste(newSeq, sep="\n")
+            totalSeqList = c(totalSeqList, newSeq)
+            
+        }
+        
+        sink(paste(geneName, ".fas"))
+        for (x in 1:length(totalSeqList)) {cat(sapply(totalSeqList[x], as.character))}
+        sink()
     }
-    
-    sink(paste(geneName, ".fas"))
-    
-    for (obj in totalSeqList) {cat(obj)}
 }
 
+fetch(c('ASPM'), "Primates")
 

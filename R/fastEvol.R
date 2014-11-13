@@ -21,33 +21,42 @@
 
 # Calculates fast evolving sites
 
+require(seqinr)
 
-fevol <- function (filename, cutoff) {
-    seqData = read.nexus(filename)
+fevol <- function(filename, cutoff=0.9) {
+    seqData = read.alignment(filename, "fasta")
     seqList = list()
-    for (pos in 1:getLength(seqData[[names(seqData)[1]]])) {
+    for (pos in 1:getLength(seqData$seq[1])) {
+        
         seqObj = c()
-        for (i in 1:length(seqData)) {
-            seqObj = c(seqObj, seqData[[names(seqData)[i]]][pos])
+        for (i in 1:length(seqData$nam)) {
+            seqObj = c(seqObj, substring(seqData[i]$seq, pos, pos))
         }
-        seqList[[pos]] = seqObj
+        
+        seqList[[sapply(pos, as.character)]] = seqObj[seqObj != "" & seqObj != "?"]
     }
+    
     
     OVlist = list()
     retOV = c()
-    
-    for (x in seqList) {
+    for (i in 1:length(seqList)) {
+        
         counter = 1
         incounter = 0
-        for (obj in x[[names(x)]]) {
-            for (inObj in x[[names(x)]]) {
+        inStore = c()
+        for (obj in seqList[[names(seqList[i])]]) {
+            inStore = c(inStore, obj)
+            for (inObj in seqList[[names(seqList[i])]][!(seqList[[names(seqList[i])]] %in% inStore)]) {
                 if (obj != inObj) {incounter = incounter + 1}
             }
         }
-        k = (length(x[[names(x)]])^2 - length(x[[names(x)]]))/2
-        OVlist[[names(x)]] = incounter/k
-        if (incounter/k >= cutoff) {
-            retOV = c(retOV, names(x))
+        
+        posVecLen = length(seqList[[names(seqList[i])]])
+        
+        k = ((posVecLen)^2 - posVecLen)/2
+        OVlist[[names(seqList[i])]] = incounter/k
+        if (incounter/k >= as.numeric(cutoff)) {
+            retOV = c(retOV, i)
         }
     }
     
@@ -55,6 +64,8 @@ fevol <- function (filename, cutoff) {
     
 }
 
+
+x = fevol("MCPH1.fas", 0.7)
 
 
 

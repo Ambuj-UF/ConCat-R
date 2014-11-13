@@ -42,6 +42,7 @@ NULL
 #' @export
 #' @examples
 #' showClass("eutil")
+
 eutil <- setRefClass(
     Class = "eutil",
     fields = list(params = "list", errors = "eutil_error", content = "character"),

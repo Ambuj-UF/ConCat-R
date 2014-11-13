@@ -22,6 +22,7 @@ NULL
 #' @export
 #' @examples
 #' showClass("eutil_error")
+
 eutil_error <- setRefClass(
   Class   = "eutil_error",
   fields  = c("error", "errmsg", "wrnmsg"),

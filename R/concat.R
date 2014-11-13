@@ -679,7 +679,6 @@ concat <- function (ext, form, outform,writeData=TRUE) {
 }
 
 
-x=concat('.nex', 'nexus','phylip_interleaved', writeData=TRUE)
 
 
 

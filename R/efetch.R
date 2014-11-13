@@ -6,6 +6,8 @@
 NULL
 
 #' @export
+
+
 .efetch <- setRefClass(
   Class="efetch",
   contains="eutil",

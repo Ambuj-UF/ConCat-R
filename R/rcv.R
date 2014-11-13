@@ -21,6 +21,7 @@
 
 # Calculates fast evolving sites
 
+require(seqinr)
 
 abs <- function (number) {
     if (number >= 0) {
@@ -33,52 +34,62 @@ abs <- function (number) {
 }
 
 
-rcvdna <- functions (filename) {
-    seqData = read.nexus(filename)
+fastaToNexus <- function(aliObj) {
+    retAli = list()
+    for (i in 1:length(aliObj$nam)) {
+        retAli[[aliObj$nam[i]]] = strsplit(sapply(aliObj$seq[i][[1]], as.character), "")
+    }
+    
+    return(retAli)
+}
+
+
+rcvdna <- function(filename){
+    seqData = read.alignment(filename, 'fasta')
+    seqData = fastaToNexus(seqData)
     numA = 0; numC = 0; numG = 0; numT = 0; numGap = 0
-    numAL = list(); numCL = list(); numGL = list(); numTL = list(); numGapL = list();
-    for (seq in seqData){
-        sequence = seqData[[names(seq)]]
-        numAL[[names(seq)]] = 0; numCL[[names(seq)]] = 0; numGL[[names(seq)]] = 0; numTL[[names(seq)]] = 0; numGapL[[names(seq)]] = 0;
-        for (charData in sequence) {
+    numAL = list(); numCL = list(); numGL = list(); numTL = list(); numGapL = list()
+    for (i in 1:length(seqData)){
+        sequence = seqData[[names(seqData[i])]]
+        numAL[[names(seqData[i])]] = 0; numCL[[names(seqData[i])]] = 0; numGL[[names(seqData[i])]] = 0; numTL[[names(seqData[i])]] = 0; numGapL[[names(seqData[i])]] = 0;
+        for (charData in sequence[[1]]) {
             if (charData == 'a') {
                 numA = numA + 1
-                numAL[[names(seq)]] = numAL[[names(seq)]] + 1
+                numAL[[names(seqData[i])]] = numAL[[names(seqData[i])]] + 1
             }
             else if (charData == 'c') {
                 numC = numC + 1
-                numCL[[names(seq)]] = numCL[[names(seq)]] + 1
+                numCL[[names(seqData[i])]] = numCL[[names(seqData[i])]] + 1
             }
             else if (charData == 'g') {
                 numG = numG + 1
-                numGL[[names(seq)]] = numGL[[names(seq)]] + 1
+                numGL[[names(seqData[i])]] = numGL[[names(seqData[i])]] + 1
             }
             else if (charData == 't') {
                 numT = numT + 1
-                numTL[[names(seq)]] = numTL[[names(seq)]] + 1
+                numTL[[names(seqData[i])]] = numTL[[names(seqData[i])]] + 1
             }
             else if (charData == '-') {
                 numGap = numGap + 1
-                numGapL[[names(seq)]] = numGapL[[names(seq)]] + 1
+                numGapL[[names(seqData[i])]] = numGapL[[names(seqData[i])]] + 1
             }
         }
     }
     
     rcvCal = 0; nTaxa = length(names(seqData))
     
-    for (species in names(seqData) {
-        rcvCal = rcvCal + abs(numAL[[species]] - (numA/nTaxa)) + abs(numGL[[species]] - (numG/nTaxa)) + abs(numCL[[species]] - (numC/nTaxa)) + abs(numTL[[species]] - (numT/nTaxa)) + abs(numGapL[[species]] - (numGap/nTaxa))
+    for (i in 1:length(seqData)) {
+        rcvCal = rcvCal + abs(numAL[[names(seqData[i])]] - (numA/nTaxa)) + abs(numGL[[names(seqData[i])]] - (numG/nTaxa)) + abs(numCL[[names(seqData[i])]] - (numC/nTaxa)) + abs(numTL[[names(seqData[i])]] - (numT/nTaxa)) + abs(numGapL[[names(seqData[i])]] - (numGap/nTaxa))
     }
-    
-    totalRCV = rcvCal/(length(nTaxa)*getLength(seqData[[names(seqData[1])]]))
-    
+
+    totalRCV = rcvCal/(length(seqData)*length(unlist(seqData[[names(seqData[1])]])))
     return(totalRCV)
-    
 }
 
 
-rcvprot <- functions (filename) {
-    seqData = read.nexus(filename)
+rcvprot <- function(filename) {
+    seqData = read.alignment(filename)
+    seqData = fastaToNexus(seqData)
     numA = 0; numB = 0; numI = 0; numL = 0; numF = 0; numN = 0;
     numS = 0; numC = 0; numH = 0; numU = 0; numG = 0; numP = 0; numGap = 0
     
@@ -86,80 +97,92 @@ rcvprot <- functions (filename) {
     numFL = list(); numNL = list(); numSL = list(); numCL = list();
     numHL = list(); numUL = list(); numGL = list(); numPL = list(); numGapL = list()
     
-    for (seq in seqData){
-        sequence = seqData[[names(seq)]]
+    for (i in 1:length(seqData)){
+        sequence = seqData[[names(seqData[i])]]
 
-        numAL[[names(seq)]] = 0; numBL[[names(seq)]] = 0;numIL[[names(seq)]] = 0;numLL[[names(seq)]] = 0;
-        numFL[[names(seq)]] = 0;numNL[[names(seq)]] = 0;numSL[[names(seq)]] = 0;numCL[[names(seq)]] = 0;
-        numHL[[names(seq)]] = 0;numUL[[names(seq)]] = 0;numGL[[names(seq)]] = 0;numPL[[names(seq)]] = 0;numGapL[[names(seq)]] = 0;
+        numAL[[names(seqData[i])]] = 0; numBL[[names(seqData[i])]] = 0;numIL[[names(seqData[i])]] = 0;numLL[[names(seqData[i])]] = 0;
+        numFL[[names(seqData[i])]] = 0; numNL[[names(seqData[i])]] = 0;numSL[[names(seqData[i])]] = 0;numCL[[names(seqData[i])]] = 0;
+        numHL[[names(seqData[i])]] = 0; numUL[[names(seqData[i])]] = 0;numGL[[names(seqData[i])]] = 0;numPL[[names(seqData[i])]] = 0;numGapL[[names(seqData[i])]] = 0;
         
         for (charData in sequence) {
             if (charData == 'd' or charData == 'e') {
                 numA = numA + 1
-                numAL[[names(seq)]] = numAL[[names(seq)]] + 1
+                numAL[[names(seqData[i])]] = numAL[[names(seqData[i])]] + 1
             }
             else if (charData == 'r' or charData == 'k') {
                 numB = numB + 1
-                numBL[[names(seq)]] = numBL[[names(seq)]] + 1
+                numBL[[names(seqData[i])]] = numBL[[names(seqData[i])]] + 1
             }
             else if (charData == 'i' or charData == 'v') {
                 numI = numI + 1
-                numIL[[names(seq)]] = numIL[[names(seq)]] + 1
+                numIL[[[names(seqData[i])]] = numIL[[names(seqData[i])]] + 1
             }
             else if (charData == 'l' or charData == 'm') {
                 numL = numL + 1
-                numLL[[names(seq)]] = numLL[[names(seq)]] + 1
+                numLL[[names(seqData[i])]] = numLL[[names(seqData[i])]] + 1
             }
             else if (charData == 'f' or charData == 'w') {
                 numF = numF + 1
-                numFL[[names(seq)]] = numFL[[names(seq)]] + 1
+                numFL[[names(seqData[i])]] = numFL[[names(seqData[i])]] + 1
             }
             else if (charData == 'n' or charData == 'q') {
                 numN = numN + 1
-                numNL[[names(seq)]] = numNL[[names(seq)]] + 1
+                numNL[[names(seqData[i])]] = numNL[[names(seqData[i])]] + 1
             }
             else if (charData == 's' or charData == 't') {
                 numS = numS + 1
-                numSL[[names(seq)]] = numSL[[names(seq)]] + 1
+                numSL[[names(seqData[i])]] = numSL[[names(seqData[i])]] + 1
             }
             else if (charData == 'c') {
                 numC = numC + 1
-                numCL[[names(seq)]] = numCL[[names(seq)]] + 1
+                numCL[[names(seqData[i])]] = numCL[[names(seqData[i])]] + 1
             }
             else if (charData == 'h') {
                 numH = numH + 1
-                numHL[[names(seq)]] = numHL[[names(seq)]] + 1
+                numHL[[names(seqData[i])]] = numHL[[names(seqData[i])]] + 1
             }
             else if (charData == 'u') {
                 numU = numU + 1
-                numUL[[names(seq)]] = numUL[[names(seq)]] + 1
+                numUL[[names(seqData[i])]] = numUL[[names(seqData[i])]] + 1
             }
             else if (charData == 'g') {
                 numG = numG + 1
-                numGL[[names(seq)]] = numGL[[names(seq)]] + 1
+                numGL[[names(seqData[i])]] = numGL[[names(seqData[i])]] + 1
             }
             else if (charData == 'p') {
                 numP = numP + 1
-                numPL[[names(seq)]] = numPL[[names(seq)]] + 1
+                numPL[[names(seqData[i])]] = numPL[[names(seqData[i])]] + 1
             }
             else if (charData == '-') {
                 numGap = numGap + 1
-                numGapL[[names(seq)]] = numGapL[[names(seq)]] + 1
+                numGapL[[names(seqData[i])]] = numGapL[[names(seqData[i])]] + 1
             }
         }
     }
     
     rcvCal = 0; nTaxa = length(names(seqData))
     
-    for (species in names(seqData) {
-        rcvCal = rcvCal + abs(numAL[[species]] - (numA/nTaxa)) + abs(numBL[[species]] - (numB/nTaxa)) + abs(numIL[[species]] - (numI/nTaxa)) + abs(numLL[[species]] - (numL/nTaxa))+ abs(numFL[[species]] - (numF/nTaxa)) + abs(numNL[[species]] - (numN/nTaxa))+ abs(numSL[[species]] - (numS/nTaxa))+ abs(numCL[[species]] - (numC/nTaxa))+ abs(numHL[[species]] - (numH/nTaxa))+ abs(numUL[[species]] - (numU/nTaxa))+ abs(numGL[[species]] - (numG/nTaxa))+ abs(numPL[[species]] - (numP/nTaxa)) + abs(numGapL[[species]] - (numGap/nTaxa))
+    for (i in 1:length(seqData)) {
+        rcvCal = rcvCal + abs(numAL[[names(seqData[i])]] - (numA/nTaxa)) + abs(numBL[[names(seqData[i])]] - (numB/nTaxa)) + abs(numIL[[names(seqData[i])]] - (numI/nTaxa)) + abs(numLL[[names(seqData[i])]] - (numL/nTaxa))+ abs(numFL[[names(seqData[i])]] - (numF/nTaxa)) + abs(numNL[[names(seqData[i])]] - (numN/nTaxa))+ abs(numSL[[names(seqData[i])]] - (numS/nTaxa))+ abs(numCL[[names(seqData[i])]] - (numC/nTaxa))+ abs(numHL[[names(seqData[i])]] - (numH/nTaxa))+ abs(numUL[[names(seqData[i])]] - (numU/nTaxa))+ abs(numGL[[names(seqData[i])]] - (numG/nTaxa))+ abs(numPL[[names(seqData[i])]] - (numP/nTaxa)) + abs(numGapL[[names(seqData[i])]] - (numGap/nTaxa))
     }
     
-    totalRCV = rcvCal/(length(nTaxa)*getLength(seqData[[names(seqData[1])]]))
+    totalRCV = rcvCal/(length(seqData)*length(unlist(seqData[[names(seqData[1])]])))
     
     return(totalRCV)
     
 }
+
+
+rcv <- function(filename, type="DNA") {
+    if (type == "DNA" | or type == "dna") {
+        rcvValue = rcvdna(filename)
+    }
+    
+    else {rcvValue = rcvprot(filename)}
+    return(rcvValue)
+}
+
+
 
 
 
