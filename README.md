@@ -1,3 +1,3 @@
-Fast concatenation package in R. It implements Dynamic Burrows–Wheeler transform to prevent memory leak for large datasets.
+Alignment concatenation and analysis package in R.
 
-Under Development phase
+Read Manual for details
