@@ -14,4 +14,7 @@ rcv(file, type = "DNA")
 Calculates RCV scores for the input alignment file 
 }
 
-\author{Ambuj Kumar \email{ambuj@ufl.edu}}
+\author{
+Ambuj Kumar \email{ambuj@ufl.edu}
+Mrinal Mishra \email{mrnlmishra@gmail.com}
+}

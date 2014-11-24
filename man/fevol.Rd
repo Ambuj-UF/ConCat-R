@@ -19,6 +19,10 @@ To calculate observed variability (OV), all sequences for a given position are c
 \references{
   Goremykin VV1, Nikiforova SV, Bininda-Emonds OR. 2010. Automated removal of noisy data in phylogenomic analyses. J Mol Evol. 71:319-31. 
   \url{http://www.ncbi.nlm.nih.gov/pubmed/20976444}
+}
 
+\author{
+Ambuj Kumar \email{ambuj@ufl.edu}
+Mrinal Mishra \email{mrnlmishra@gmail.com}
 }
 
