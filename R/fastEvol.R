@@ -23,8 +23,12 @@
 
 require(seqinr)
 
-fevol <- function(filename, cutoff=0.9) {
-    seqData = read.alignment(filename, "fasta")
+
+#' Class \code{"fast-evol"}
+#' @export
+#' usage = fevol(file, cutoff)
+fevol <- function(file, cutoff=0.9) {
+    seqData = read.alignment(file, "fasta")
     seqList = list()
     for (pos in 1:getLength(seqData$seq[1])) {
         
@@ -65,7 +69,6 @@ fevol <- function(filename, cutoff=0.9) {
 }
 
 
-x = fevol("MCPH1.fas", 0.7)
 
 
 

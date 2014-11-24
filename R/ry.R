@@ -19,11 +19,13 @@
 #                                                                                                              #
 ################################################################################################################
 
-# RY coding
-# Usage rycode(alignment-Object, type=3)
 
+#' Class \code{"RY-coding"}
+#' @export
+#' usage=rycode(file, type=3)
 
-rycode <- function (seqData, type=3) {
+rycode <- function (file, type=3) {
+    seqData = read.nexus.data(file)
     if (type == 3) {
         for (i in 1:length(seqData)) {
             counter = 1

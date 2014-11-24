@@ -3,6 +3,7 @@
 # Copyright (C) {2014}  {Ambuj Kumar, Kimball-Brain lab group, Biology Department, University of Florida}      #
 #                       {Mrinal Mishra, VTT Technical Research Center, Finland}                                #
 # "read.nex" and write.nex are Simplified NEXUS data parser by Johan Nylander, nylander @ scs.fsu.edu          #
+# "read.nex" is a Simplified NEXUS data parser by Johan Nylander, nylander @ scs.fsu.edu                       #
 # WARNING: This is parser reads a restricted nexus format, see the link below for details                      #
 # http://svitsrv25.epfl.ch/R-doc/library/ape/html/read.nexus.data.html &                                       #
 # http://www.inside-r.org/packages/cran/ape/docs/write.nexus.data                                              #
@@ -27,11 +28,8 @@
 
 library(seqinr)
 
-#' Class \code{"read-nexus"}
-#' @export
 
-
-read.nex <- function (file)
+read.nexus.data <- function (file)
 {
     find.ntax <- function (x)
     {
@@ -458,8 +456,9 @@ blocksep = 1)
 }
 
 
-#' Class \code{"concat-functions"}
-#' @export
+
+
+
 insertRow <- function(existingDF, newrow, r) {
     existingDF <- rbind(existingDF,setNames(newrow, names(existingDF)))
     existingDF <- existingDF[order(c(1:(nrow(existingDF)-1),r-0.5)),]
@@ -467,8 +466,7 @@ insertRow <- function(existingDF, newrow, r) {
     return(existingDF)
 }
 
-#' Class \code{"concat-functions"}
-#' @export
+
 baseConCat <- function(dataFileExtension, fileFormat){
     files = list.files(pattern=dataFileExtension)
     dataObject = data.frame("FileName"='Test',"Species"='Test',"Sequence"='Test')
@@ -551,14 +549,13 @@ baseConCat <- function(dataFileExtension, fileFormat){
     return(concatFrame)
 }
 
-#' Class \code{"concat-functions"}
-#' @export
+
 nexConCat <- function(dataFileExtension, fileFormat) {
     nexFiles = list.files(pattern=dataFileExtension)
     speciesAll = c()
     dataObject = data.frame("FileName" = 'Test', "Species" = 'Test', "Sequence" = 'Test')
     for (filename in nexFiles) {
-        nexData = tryCatch({read.nex(filename)}, finally = {print(filename)})
+        nexData = tryCatch({read.nexus.data(filename)}, finally = {print(filename)})
         speciesAll = c(speciesAll, names(nexData))
         for (i in 1:length(nexData)) {
             dataObject = insertRow(dataObject, data.frame("FileName" = filename, "Species" = names(nexData[i]), "Sequence" = paste(nexData[[names(nexData[i])]], collapse="")), 1)
@@ -627,10 +624,6 @@ nexConCat <- function(dataFileExtension, fileFormat) {
     return(concatFrame)
 }
 
-#' Class \code{"concat-functions"}
-#' @export
-#' Usage x=concat('.nex', 'nexus', writeData=TRUE)
-#' Usage x=concat('.fas', 'fasta', writeData=TRUE)
 
 concat <- function (ext, form, outform,writeData=TRUE) {
     if (form == 'nexus') {
@@ -654,7 +647,7 @@ concat <- function (ext, form, outform,writeData=TRUE) {
         names(seq1)[i]<-as.character(paste(unlist(sapply(strsplit(sapply(seq_name[[i]],as.character),""),as.list)[1:10]),collapse=""))
     }
     
-    
+
     if (outform == 'nexus') {
         outData= seq
         write.nex(outData, file= "Output.nex", interleaved = TRUE, charsperline = 100)
@@ -678,6 +671,9 @@ concat <- function (ext, form, outform,writeData=TRUE) {
     return(outData)
 }
 
+
+
+#x=concat('.nex', 'nexus','phylip_interleaved', writeData=TRUE)
 
 
 

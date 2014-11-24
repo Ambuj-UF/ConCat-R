@@ -25,7 +25,7 @@ require(seqinr)
 
 abs <- function (number) {
     if (number >= 0) {
-        pass
+        number = number
     }
     else {
         number = - number
@@ -105,31 +105,31 @@ rcvprot <- function(filename) {
         numHL[[names(seqData[i])]] = 0; numUL[[names(seqData[i])]] = 0;numGL[[names(seqData[i])]] = 0;numPL[[names(seqData[i])]] = 0;numGapL[[names(seqData[i])]] = 0;
         
         for (charData in sequence) {
-            if (charData == 'd' or charData == 'e') {
+            if (charData == 'd' | charData == 'e') {
                 numA = numA + 1
                 numAL[[names(seqData[i])]] = numAL[[names(seqData[i])]] + 1
             }
-            else if (charData == 'r' or charData == 'k') {
+            else if (charData == 'r' | charData == 'k') {
                 numB = numB + 1
                 numBL[[names(seqData[i])]] = numBL[[names(seqData[i])]] + 1
             }
-            else if (charData == 'i' or charData == 'v') {
+            else if (charData == 'i' | charData == 'v') {
                 numI = numI + 1
-                numIL[[[names(seqData[i])]] = numIL[[names(seqData[i])]] + 1
+                numIL[[names(seqData[i])]] = numIL[[names(seqData[i])]] + 1
             }
-            else if (charData == 'l' or charData == 'm') {
+            else if (charData == 'l' | charData == 'm') {
                 numL = numL + 1
                 numLL[[names(seqData[i])]] = numLL[[names(seqData[i])]] + 1
             }
-            else if (charData == 'f' or charData == 'w') {
+            else if (charData == 'f' | charData == 'w') {
                 numF = numF + 1
                 numFL[[names(seqData[i])]] = numFL[[names(seqData[i])]] + 1
             }
-            else if (charData == 'n' or charData == 'q') {
+            else if (charData == 'n' | charData == 'q') {
                 numN = numN + 1
                 numNL[[names(seqData[i])]] = numNL[[names(seqData[i])]] + 1
             }
-            else if (charData == 's' or charData == 't') {
+            else if (charData == 's' | charData == 't') {
                 numS = numS + 1
                 numSL[[names(seqData[i])]] = numSL[[names(seqData[i])]] + 1
             }
@@ -173,12 +173,15 @@ rcvprot <- function(filename) {
 }
 
 
-rcv <- function(filename, type="DNA") {
-    if (type == "DNA" | or type == "dna") {
-        rcvValue = rcvdna(filename)
+#' Class \code{"RCV"}
+#' @export
+#' usage = rcv(file, type="DNA")
+rcv <- function(file, type="DNA") {
+    if (type == "DNA" | type == "dna") {
+        rcvValue = rcvdna(file)
     }
     
-    else {rcvValue = rcvprot(filename)}
+    else {rcvValue = rcvprot(file)}
     return(rcvValue)
 }
 

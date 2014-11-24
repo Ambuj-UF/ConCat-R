@@ -23,6 +23,7 @@
 
 require(seqinr)
 
+
 shannon <- function(Obj) {
     totEntVect = c()
     entList = list()
@@ -59,7 +60,6 @@ shannon <- function(Obj) {
     entropy = sum(totEntVect)/getLength(Obj$seq[1])
     return(entropy)
 }
-
 
 
 shannonProt <- function (Obj) {
@@ -122,7 +122,9 @@ shannonProt <- function (Obj) {
     return(entropy)
 }
 
-
+#' Class \code{"entropy"}
+#' @export
+#' usage = entcal(file, type="DNA")
 entcal <- function(file, type="DNA") {
     if (type == "DNA" | type == "dna") {
         alignment = read.alignment("MCPH1.fas", "fasta")

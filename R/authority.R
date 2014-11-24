@@ -21,35 +21,33 @@
 
 # taxa authority functions
 
-
-excTaxaNex <- functions (alignmentObject, authorityFile) {
-    taxExc = read.table(authorityFile,header=FALSE,sep="\n")
+etax.nex <- function (ali, auth) {
+    taxExc = read.table(auth,header=FALSE,sep="\n")
     for (taxa in taxExc) {
-        alignmentObject[[taxa]] = NULL
+        ali[[taxa]] = NULL
     }
     
-    return(alignmentObject)
+    return(ali)
 }
 
 
-
-incTaxaNex <- functions (alignmentObject, authorityFile) {
-    taxInc = read.table(authorityFile,header=FALSE,sep="\n")
+itax.nex <- function (ali, auth) {
+    taxInc = read.table(auth,header=FALSE,sep="\n")
     newTaxaList = list()
     for (taxa in taxInc) {
-        newTaxaList[[taxa]] = alignmentObject[[taxa]]
+        newTaxaList[[taxa]] = ali[[taxa]]
     }
     
     return(newTaxaList)
 }
 
 
-excTaxaOd <- functions (alignmentObject, authorityFile) {
-    taxExc = read.table(authorityFile,header=FALSE,sep="\n")
-    nameString = sapply(alignmentObject$Species[1], as.character)
+etax.od <- function (ali, auth) {
+    taxExc = read.table(auth,header=FALSE,sep="\n")
+    nameString = sapply(ali$Species[1], as.character)
     newTaxaExc = c()
     if (substr(nameString, getLength(nameString), getLength(nameString)) == '\r') {
-        for (i in 1:length(taxInc$V!)) {
+        for (i in 1:length(taxInc$V1)) {
             newTaxaInc = c(newTaxaInc, taxInc[i,])
             newTaxaInc = c(newTaxaInc, paste(taxInc[i,], '\r', sep=''))
         }
@@ -57,17 +55,18 @@ excTaxaOd <- functions (alignmentObject, authorityFile) {
     
     else {newTaxaExc = taxExc}
     
-    dataObject = alignmentObject[!(alignmentObject$Species) %in% taxExc,]
-    return(alignmentObject)
+    dataObject = ali[!(ali$Species) %in% taxExc,]
+    return(dataObject)
 }
 
 
-incTaxaOd <- functions (alignmentObject, authorityFile) {
-    taxInc = read.table(authorityFile,header=FALSE,sep="\n")
-    nameString = sapply(alignmentObject$Species[1], as.character)
+
+itax.od <- function (ali, auth) {
+    taxInc = read.table(auth,header=FALSE,sep="\n")
+    nameString = sapply(ali$Species[1], as.character)
     newTaxaInc = c()
     if (substr(nameString, getLength(nameString), getLength(nameString)) == '\r') {
-        for (i in 1:length(taxExc$V!)) {
+        for (i in 1:length(taxExc$V1)) {
             newTaxaExc = c(newTaxaExc, taxExc[i,])
             newTaxaExc = c(newTaxaExc, paste(taxExc[i,], '\r', sep=''))
         }
@@ -75,8 +74,8 @@ incTaxaOd <- functions (alignmentObject, authorityFile) {
     
     else {newTaxaInc = taxInc}
     
-    dataObject = alignmentObject[(alignmentObject$Species) %in% newTaxaExc,]
-    return(alignmentObject)
+    dataObject = ali[(ali$Species) %in% newTaxaExc,]
+    return(dataObject)
 }
 
 

@@ -1,0 +1,11 @@
+Package: ConCat
+Title: Test your phylogeny
+Version: 1.0
+Author: Ambuj Kumar
+Maintainer: Ambuj Kumar <ambuj@ufl.edu>
+Description: Perform alignment concatenation and analysis
+Depends:
+    seqinr
+License: GPL (>= 2)
+URL: https://github.com/Ambuj-UF/ConCat-R
+Packaged: 2014-10-29 04:55:33 UTC; ambuj
