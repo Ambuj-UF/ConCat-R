@@ -115,7 +115,11 @@ rcvprot <- function(filename) {
             }
             else if (charData == 'i' | charData == 'v') {
                 numI = numI + 1
+<<<<<<< HEAD
                 numIL[[names(seqData[i])]] = numIL[[names(seqData[i])]] + 1
+=======
+                numIL[[[names(seqData[i])]] = numIL[[names(seqData[i])]] + 1
+>>>>>>> FETCH_HEAD
             }
             else if (charData == 'l' | charData == 'm') {
                 numL = numL + 1
@@ -173,6 +177,7 @@ rcvprot <- function(filename) {
 }
 
 
+<<<<<<< HEAD
 #' Class \code{"RCV"}
 #' @export
 #' usage = rcv(file, type="DNA")
@@ -182,6 +187,14 @@ rcv <- function(file, type="DNA") {
     }
     
     else {rcvValue = rcvprot(file)}
+=======
+rcv <- function(filename, type="DNA") {
+    if (type == "DNA" | or type == "dna") {
+        rcvValue = rcvdna(filename)
+    }
+    
+    else {rcvValue = rcvprot(filename)}
+>>>>>>> FETCH_HEAD
     return(rcvValue)
 }
 

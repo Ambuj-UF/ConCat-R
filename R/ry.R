@@ -19,6 +19,7 @@
 #                                                                                                              #
 ################################################################################################################
 
+<<<<<<< HEAD
 
 #' Class \code{"RY-coding"}
 #' @export
@@ -26,6 +27,13 @@
 
 rycode <- function (file, type=3) {
     seqData = read.nexus.data(file)
+=======
+# RY coding
+# Usage rycode(alignment-Object, type=3)
+
+
+rycode <- function (seqData, type=3) {
+>>>>>>> FETCH_HEAD
     if (type == 3) {
         for (i in 1:length(seqData)) {
             counter = 1
