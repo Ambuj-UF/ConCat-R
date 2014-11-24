@@ -474,6 +474,8 @@ baseConCat <- function(dataFileExtension, fileFormat){
     names(dataObject) = header_col
     
     for (file in files) {
+        cat(file)
+        cat("\n")
         data = read.alignment(file, fileFormat)
         x = 1
         while (x <= length(data$seq)){
@@ -555,7 +557,9 @@ nexConCat <- function(dataFileExtension, fileFormat) {
     speciesAll = c()
     dataObject = data.frame("FileName" = 'Test', "Species" = 'Test', "Sequence" = 'Test')
     for (filename in nexFiles) {
-        nexData = tryCatch({read.nexus.data(filename)}, finally = {print(filename)})
+        cat(filename)
+        cat("\n")
+        nexData = read.nexus.data(filename)
         speciesAll = c(speciesAll, names(nexData))
         for (i in 1:length(nexData)) {
             dataObject = insertRow(dataObject, data.frame("FileName" = filename, "Species" = names(nexData[i]), "Sequence" = paste(nexData[[names(nexData[i])]], collapse="")), 1)
@@ -625,7 +629,7 @@ nexConCat <- function(dataFileExtension, fileFormat) {
 }
 
 
-concat <- function (ext, form, outform,writeData=TRUE) {
+concat <- function (ext, form, outform='fasta',writeData=TRUE) {
     if (form == 'nexus') {
         outData = nexConCat(ext, 'nexus')
     }
@@ -635,39 +639,49 @@ concat <- function (ext, form, outform,writeData=TRUE) {
     if (writeData == TRUE) {
         write.fasta(as.list(outData$Sequence), outData$Species, nbchar = 60, "Output.fas", open = 'w')
     }
-    fasta <- read.alignment("Output.fas", format = "fasta")
-    seq_list=fasta$seq
-    seq_name=fasta$nam
-    seq=list()
-    seq1=list()
-    for (i in 1:length(seq_list)) {
-        seq[[i]]<-sapply(c(strsplit(sapply(seq_list[[i]],as.character),"")),as.character)
-        names(seq)[i]<-as.character(fasta$nam[i])
-        seq1[[i]]<-sapply(c(strsplit(sapply(seq_list[[i]],as.character),"")),as.character)
-        names(seq1)[i]<-as.character(paste(unlist(sapply(strsplit(sapply(seq_name[[i]],as.character),""),as.list)[1:10]),collapse=""))
+    
+    if (writeData == TRUE & outform != 'fasta') {
+        fasta <- read.alignment("Output.fas", format = "fasta")
+    
+        if (outform != 'fasta') {
+            seq_list=fasta$seq
+            seq_name=fasta$nam
+            seq=list()
+            for (i in 1:length(seq_list)) {
+                if (outform == 'nexus' | outform=='phylip_relaxed') {
+                    seq[[i]]<-sapply(c(strsplit(sapply(seq_list[[i]],as.character),"")),as.character)
+                    names(seq)[i]<-as.character(fasta$nam[i])
+                }
+                else if (outform=='phylip_interleaved' | outform=='phylip_sequential') {
+                    seq[[i]]<-sapply(c(strsplit(sapply(seq_list[[i]],as.character),"")),as.character)
+                    names(seq)[i]<-as.character(paste(unlist(sapply(strsplit(sapply(seq_name[[i]],as.character),""),as.list)[1:10]),collapse=""))
+                }
+            }
+        }
+    
+    
+        if (outform == 'nexus') {
+            outData= seq
+            write.nex(outData, file= "Output.nex", interleaved = TRUE, charsperline = 100)
+            unlink("Output.fas", recursive = FALSE)
+        }
+        if (outform=='phylip_relaxed'){
+            outData=seq
+            write.dna(outData,file="Output_phy_relaxed.phy" , format = "interleaved")
+            unlink("Output.fas", recursive = FALSE)
+        }
+        if (outform=='phylip_interleaved'){
+            outData=seq
+            write.dna(outData,file="Output_phy_interleaved.phy" , format = "interleaved")
+            unlink("Output.fas", recursive = FALSE)
+        }
+        if (outform=='phylip_sequential'){
+            outData=seq
+            write.dna(outData,file="Output_phy_sequential.phy" , format = "sequential")
+            unlink("Output.fas", recursive = FALSE)
+        }
     }
     
-
-    if (outform == 'nexus') {
-        outData= seq
-        write.nex(outData, file= "Output.nex", interleaved = TRUE, charsperline = 100)
-        unlink("Output.fas", recursive = FALSE)
-    }
-    if (outform=='phylip_relaxed'){
-        outData=seq
-        write.dna(outData,file="Output_phy_relaxed.phy" , format = "interleaved")
-        unlink("Output.fas", recursive = FALSE)
-    }
-    if (outform=='phylip_interleaved'){
-        outData=seq1
-        write.dna(outData,file="Output_phy_interleaved.phy" , format = "interleaved")
-        unlink("Output.fas", recursive = FALSE)
-    }
-    if (outform=='phylip_sequential'){
-        outData=seq1
-        write.dna(outData,file="Output_phy_sequential.phy" , format = "sequential")
-        unlink("Output.fas", recursive = FALSE)
-    }
     return(outData)
 }
 

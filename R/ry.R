@@ -19,31 +19,19 @@
 #                                                                                                              #
 ################################################################################################################
 
-<<<<<<< HEAD
-
-#' Class \code{"RY-coding"}
-#' @export
-#' usage=rycode(file, type=3)
 
 rycode <- function (file, type=3) {
     seqData = read.nexus.data(file)
-=======
-# RY coding
-# Usage rycode(alignment-Object, type=3)
-
-
-rycode <- function (seqData, type=3) {
->>>>>>> FETCH_HEAD
     if (type == 3) {
         for (i in 1:length(seqData)) {
             counter = 1
             for (char in unlist(seqData[[names(seqData[i])]])) {
                 if (counter%%3 == 0) {
-                    if (seqData[[names(seqData[i])]][[1]][counter] == 'a' | seqData[[names(seqData[i])]][[1]][counter] == 'g') {
-                        seqData[[names(seqData[i])]][[1]][counter] = 'r'
+                    if (char == 'a' | char == 'g') {
+                        seqData[[names(seqData[i])]][counter] = 'r'
                     }
-                    else if(seqData[[names(seqData[i])]][[1]][counter] == 't' | seqData[[names(seqData[i])]][[1]][counter] == 'c') {
-                        seqData[[names(seqData[i])]][[1]][counter] = 'y'
+                    else if(char == 't' | char == 'c') {
+                        seqData[[names(seqData[i])]][counter] = 'y'
                     }
                     
                 }
@@ -56,11 +44,11 @@ rycode <- function (seqData, type=3) {
     else if (type == 'all') {
         for (i in 1:length(seqData)) {
             for (char in unlist(seqData[[names(seqData[i])]])) {
-                if (seqData[[names(seqData[i])]][[1]][counter] == 'a' | seqData[[names(seqData[i])]][[1]][counter] == 'g') {
-                    seqData[[names(seqData[i])]][[1]][counter] = 'r'
+                if (char == 'a' | char == 'g') {
+                    seqData[[names(seqData[i])]][counter] = 'r'
                 }
-                else if(seqData[[names(seqData[i])]][[1]][counter] == 't' | seqData[[names(seqData[i])]][[1]][counter] == 'c') {
-                    seqData[[names(seqData[i])]][[1]][counter] = 'y'
+                else if(char == 't' | char == 'c') {
+                    seqData[[names(seqData[i])]][counter] = 'y'
                 }
             }
         }
@@ -76,17 +64,3 @@ rycode <- function (seqData, type=3) {
     
     sink()
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
