@@ -23,6 +23,5 @@ To calculate observed variability (OV), all sequences for a given position are c
 
 \author{
 Ambuj Kumar \email{ambuj@ufl.edu}
-Mrinal Mishra \email{mrnlmishra@gmail.com}
 }
 
